@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="@dimen/size_16"
+            android:contentDescription="@string/back_line"
+            android:src="@drawable/arrow_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/settings_line"
+            android:textColor="@color/black"
+            android:textSize="@dimen/size_22" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        tools:ignore="UseSwitchCompatOrMaterialXml">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/padding_16"
+            android:layout_marginTop="10dp"
+            android:text="@string/dark_theme_line"
+            android:textColor="@color/black"
+            android:textSize="@dimen/size_16" />
+
+        <Switch
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:thumb="@color/white"
+            android:background="@drawable/off"/>
+
+
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/padding_16"
+            android:text="@string/share_app_line"
+            android:textColor="@color/black"
+            android:textSize="@dimen/size_16" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="18dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/share_app_line"
+            android:src="@drawable/share" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/padding_16"
+            android:text="@string/support_line"
+            android:textColor="@color/black"
+            android:textSize="@dimen/size_16" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="18dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/support_line"
+            android:src="@drawable/support" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/padding_16"
+            android:text="@string/user_agreement_line"
+            android:textColor="@color/black"
+            android:textSize="@dimen/size_16" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="18dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/user_agreement_line"
+            android:src="@drawable/arrow_forward" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

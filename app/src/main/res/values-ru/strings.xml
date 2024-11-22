@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_line">Поиск</string>
+    <string name="media_library_line">Медиатека</string>
+    <string name="settings_line">Настройки</string>
+    <string name="back_line">Назад</string>
+    <string name="dark_theme_line">Тёмная тема</string>
+    <string name="share_app_line">Поделиться приложением</string>
+    <string name="support_line">Написать в поддержку</string>
+    <string name="user_agreement_line">Пользовательское соглашение</string>
+</resources>

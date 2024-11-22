@@ -2,6 +2,9 @@
 <resources>
     <dimen name="padding_16">16dp</dimen>
     <dimen name="padding_12">12dp</dimen>
+    <dimen name="padding_18">18dp</dimen>
+    <dimen name="padding_42">42dp</dimen>
     <dimen name="size_22">22sp</dimen>
     <dimen name="size_16">16sp</dimen>
+    <dimen name="icon_24">24dp</dimen>
 </resources>

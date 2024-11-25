@@ -17,7 +17,7 @@
             android:layout_height="@dimen/icon_24"
             android:layout_margin="@dimen/size_16"
             android:contentDescription="@string/back_line"
-            android:src="@drawable/arrow_back" />
+            android:src="@drawable/ic_arrow_back_24" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -45,12 +45,12 @@
             android:textColor="@color/black_night"
             android:textSize="@dimen/size_16" />
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/dark_theme_button"
             android:layout_width="56dp"
             android:layout_height="40dp"
             android:layout_gravity="end"
-            android:background="@drawable/off"
+            android:background="@drawable/ic_off_56_40"
             android:checked="false"
             android:thumb="@color/white_night" />
 
@@ -76,7 +76,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/padding_18"
             android:contentDescription="@string/share_app_line"
-            android:src="@drawable/share" />
+            android:src="@drawable/ic_share_24" />
 
     </FrameLayout>
 
@@ -100,7 +100,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/padding_18"
             android:contentDescription="@string/support_line"
-            android:src="@drawable/support" />
+            android:src="@drawable/ic_support_24" />
 
     </FrameLayout>
 
@@ -124,7 +124,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/padding_18"
             android:contentDescription="@string/user_agreement_line"
-            android:src="@drawable/arrow_forward" />
+            android:src="@drawable/ic_arrow_forward_24" />
 
     </FrameLayout>
 

@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Playlist Maker</string>
+    <string name="app_name" translatable="false">Playlist maker</string>
+    <string name="search_line">Search</string>
+    <string name="media_library_line">Media library</string>
+    <string name="settings_line">Settings</string>
+    <string name="back_line">Back</string>
+    <string name="dark_theme_line">Dark theme</string>
+    <string name="share_app_line">Share app</string>
+    <string name="support_line">Write to support</string>
+    <string name="user_agreement_line">User agreement</string>
 </resources>

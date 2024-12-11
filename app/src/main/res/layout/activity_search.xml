@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/search_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_night"
     android:orientation="vertical">
 
-    <FrameLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/back_button"
-            android:layout_width="@dimen/icon_24"
-            android:layout_height="@dimen/icon_24"
-            android:layout_margin="@dimen/size_16"
-            android:contentDescription="@string/back_line"
-            android:src="@drawable/ic_arrow_back_24" />
-
-        <TextView
-            style="@style/TitleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="14dp"
-            android:text="@string/search_line"
-            android:textColor="@color/black_night" />
-
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        app:title="@string/search_line"
+        app:titleTextAppearance="@style/TitleStyle"
+        app:contentInsetStartWithNavigation="0dp"
+        app:titleTextColor="@color/black_night"
+        app:navigationIcon="@drawable/ic_arrow_back_24"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -47,6 +35,7 @@
             android:hint="@string/search_line"
             android:importantForAutofill="no"
             android:inputType="text"
+            android:textCursorDrawable="@drawable/cursor_color"
             android:maxLines="1"
             android:maxLength="100"
             android:paddingStart="12dp"

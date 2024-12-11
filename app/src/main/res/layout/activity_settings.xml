@@ -1,108 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setting_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_night"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/back_button"
-            android:layout_width="@dimen/icon_24"
-            android:layout_height="@dimen/icon_24"
-            android:layout_margin="@dimen/size_16"
-            android:contentDescription="@string/back_line"
-            android:src="@drawable/ic_arrow_back_24" />
-
-        <TextView
-            style="@style/TitleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="14dp"
-            android:text="@string/settings_line"
-            android:textColor="@color/black_night" />
-
-    </FrameLayout>
-
-    <FrameLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        tools:ignore="UseSwitchCompatOrMaterialXml">
+        app:contentInsetStartWithNavigation="0dp"
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:title="@string/settings_line"
+        app:titleTextAppearance="@style/TitleStyle"
+        app:titleTextColor="@color/black_night" />
 
-        <TextView
-            style="@style/SettingsTextStyle"
-            android:layout_marginTop="10dp"
-            android:text="@string/dark_theme_line"/>
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/dark_theme_switch"
-            android:layout_width="56dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:background="@drawable/ic_off_56_40"
-            android:checked="false"
-            android:thumb="@color/white_night" />
-
-    </FrameLayout>
-
-    <FrameLayout
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/dark_theme_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_42">
+        android:layout_marginTop="@dimen/icon_24"
+        android:fontFamily="@font/ys_display_regular"
+        android:gravity="center_vertical"
+        android:paddingVertical="@dimen/padding_20"
+        android:paddingHorizontal="@dimen/padding_16"
 
-        <TextView
-            style="@style/SettingsTextStyle"
-            android:text="@string/share_app_line"/>
+        android:text="@string/dark_theme_line"
+        android:textColor="@color/black_night"
+        android:textSize="@dimen/size_16"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
 
-        <ImageView
-            android:id="@+id/share_button"
-            style="@style/IconSettingsStyle"
-            android:contentDescription="@string/share_app_line"
-            android:src="@drawable/ic_share_24" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/share_button"
+        style="@style/SettingsStyle"
+        android:drawableEnd="@drawable/ic_share_24"
+        android:text="@string/share_app_line" />
 
-    </FrameLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/support_button"
+        style="@style/SettingsStyle"
+        android:drawableEnd="@drawable/ic_support_24"
+        android:text="@string/support_line" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_42">
-
-        <TextView
-            style="@style/SettingsTextStyle"
-            android:text="@string/support_line" />
-
-        <ImageView
-            android:id="@+id/support_button"
-            android:layout_width="@dimen/icon_24"
-            style="@style/IconSettingsStyle"
-            android:contentDescription="@string/support_line"
-            android:src="@drawable/ic_support_24" />
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_42">
-
-        <TextView
-            style="@style/SettingsTextStyle"
-            android:text="@string/user_agreement_line" />
-
-        <ImageView
-            android:id="@+id/user_agreement_button"
-            style="@style/IconSettingsStyle"
-            android:contentDescription="@string/user_agreement_line"
-            android:src="@drawable/ic_arrow_forward_24" />
-
-    </FrameLayout>
-
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/user_agreement_button"
+        style="@style/SettingsStyle"
+        android:drawableEnd="@drawable/ic_arrow_forward_24"
+        android:text="@string/user_agreement_line" />
 
 </LinearLayout>

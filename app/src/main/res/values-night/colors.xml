@@ -4,8 +4,6 @@
      <color name="grey">#FFFFFFFF</color>
      <color name="black_night">#FFFFFFFF</color>
      <color name="white_night">#1A1B22</color>
-     <color name="grey_night">#3772E7</color>
-     <color name="light_grey">#9FBBF3</color>
      <color name="grey_white">#FFFFFF</color>
      <color name="grey_black">#1A1B22</color>
  </resources>

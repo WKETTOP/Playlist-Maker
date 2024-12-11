@@ -5,16 +5,24 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 
 class SearchActivity : AppCompatActivity() {
+
+    companion object {
+        const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
+        const val TEXT_DEF = ""
+    }
+
+    private var textInputValue: String = TEXT_DEF
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,11 +34,11 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        val backButton = findViewById<ImageView>(R.id.back_button)
+        val searchToolbar = findViewById<Toolbar>(R.id.search_toolbar)
         val inputTextEdit = findViewById<EditText>(R.id.inputEditText)
         val clearButton = findViewById<ImageView>(R.id.clear_text)
 
-        backButton.setOnClickListener {
+        searchToolbar.setNavigationOnClickListener {
             val backIntent = Intent(this, MainActivity::class.java)
             startActivity(backIntent)
         }
@@ -48,7 +56,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 textInputValue = s.toString()
-                clearButton.visibility = clearButtonVisibility(s)
+                clearButton.isVisible = !s.isNullOrEmpty()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -57,21 +65,6 @@ class SearchActivity : AppCompatActivity() {
         }
         inputTextEdit.addTextChangedListener(simpleTextWatcher)
     }
-
-    fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
-
-    companion object {
-        const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
-        const val TEXT_DEF = ""
-    }
-
-    private var textInputValue: String = TEXT_DEF
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

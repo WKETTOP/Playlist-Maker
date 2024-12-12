@@ -25,8 +25,9 @@
         android:fontFamily="@font/ys_display_regular"
         android:gravity="center_vertical"
         android:paddingVertical="@dimen/padding_20"
-        android:paddingHorizontal="@dimen/padding_16"
-
+        android:paddingStart="@dimen/padding_16"
+        android:paddingEnd="@dimen/padding_18"
+        android:thumbTintMode="screen"
         android:text="@string/dark_theme_line"
         android:textColor="@color/black_night"
         android:textSize="@dimen/size_16"

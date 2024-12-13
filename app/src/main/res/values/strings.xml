@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">Playlist maker</string>
+    <string name="url_android_dev" translatable="false">https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_email" translatable="false">praktikum@support.yandex.ru</string>
+    <string name="url_user_agreement" translatable="false">https://yandex.ru/legal/practicum_offer/</string>
     <string name="search_line">Search</string>
     <string name="media_library_line">Media library</string>
     <string name="settings_line">Settings</string>
@@ -8,4 +11,7 @@
     <string name="share_app_line">Share app</string>
     <string name="support_line">Write to support</string>
     <string name="user_agreement_line">User agreement</string>
+    <string name="support_email_subject">Message to the developers and developers of the Playlist Maker app</string>
+    <string name="support_email_body">Thanks to the developers for the cool app!</string>
+    <string name="clear_line">Clear</string>
 </resources>

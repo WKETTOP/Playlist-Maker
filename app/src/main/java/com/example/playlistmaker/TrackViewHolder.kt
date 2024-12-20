@@ -1,5 +1,7 @@
 package com.example.playlistmaker
 
+import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -19,14 +21,26 @@ class TrackViewHolder(parent: ViewGroup) :
     private val timeTrack: TextView = itemView.findViewById(R.id.track_time)
 
     fun bind(track: Track) {
+
+        val cornerRadiusInDp = 2f
+        val cornerRadiusInPx = dpToPx(cornerRadiusInDp, itemView.context)
+
         Glide.with(itemView)
             .load(track.artworkUrl100)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
-            .transform(RoundedCorners(2))
+            .transform(RoundedCorners(cornerRadiusInPx))
             .into(artWork)
         nameTrack.text = track.trackName
         nameArtist.text = track.artistName
         timeTrack.text = track.trackTime
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            context.resources.displayMetrics
+        ).toInt()
     }
 }

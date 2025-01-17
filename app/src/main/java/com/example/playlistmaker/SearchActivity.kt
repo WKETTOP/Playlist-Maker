@@ -24,8 +24,6 @@ import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
@@ -37,14 +35,10 @@ class SearchActivity : AppCompatActivity() {
     private var textInputValue: String = TEXT_DEF
     private var lastSearchQuery: String? = null
 
-    private val itunesBaseUrl = "https://itunes.apple.com"
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(itunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val itunesService = retrofit.create(ItunesApi::class.java)
+    private val itunesService: ItunesApi by lazy {
+        RetrofitClient.getApiService()
+    }
 
     private lateinit var searchToolbar: Toolbar
     private lateinit var inputTextEdit: EditText
@@ -53,8 +47,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorImage: ImageView
     private lateinit var refreshButton: Button
     private lateinit var searchResult: RecyclerView
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var historyAdapter: HistoryAdapter
 
     private val tracks = ArrayList<Track>()
+    private var searchHistory = mutableListOf<String>()
 
     private val trackAdapter = TrackAdapter()
 
@@ -75,11 +72,20 @@ class SearchActivity : AppCompatActivity() {
         errorImage = findViewById(R.id.error_image)
         refreshButton = findViewById(R.id.refresh_button)
         searchResult = findViewById(R.id.search_result)
+        historyRecyclerView = findViewById(R.id.search_history)
 
         trackAdapter.tracks = tracks
 
+        historyAdapter = HistoryAdapter(searchHistory) { query ->
+            inputTextEdit.setText(query)
+            performSearch(query)
+        }
+
         searchResult.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         searchResult.adapter = trackAdapter
+
+        historyRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        historyRecyclerView.adapter = historyAdapter
 
         searchToolbar.setNavigationOnClickListener {
             val backIntent = Intent(this, MainActivity::class.java)
@@ -101,6 +107,14 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 textInputValue = s.toString()
                 clearButton.isVisible = !s.isNullOrEmpty()
+                tracks.clear()
+                trackAdapter.notifyDataSetChanged()
+                if (s.isNullOrEmpty()) {
+                    hideResultsAndShowHistory()
+                } else {
+                    searchResult.visibility = View.VISIBLE
+                    historyRecyclerView.visibility = View.GONE
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -164,6 +178,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun performSearch(query: String) {
         lastSearchQuery = query
+        searchHistory.add(query)
         itunesService.search(query).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
                 if (response.isSuccessful) {
@@ -188,5 +203,15 @@ class SearchActivity : AppCompatActivity() {
                 showError(getString(R.string.communication_problems), t.message.toString())
             }
         })
+    }
+
+    private fun hideResultsAndShowHistory() {
+        searchResult.visibility = View.GONE
+        if (searchHistory.isNotEmpty()) {
+            historyRecyclerView.visibility = View.VISIBLE
+            historyAdapter.notifyDataSetChanged()
+        } else {
+            historyRecyclerView.visibility = View.GONE
+        }
     }
 }

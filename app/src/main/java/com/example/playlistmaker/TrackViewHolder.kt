@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.util.Locale
 
 class TrackViewHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(
@@ -33,7 +35,8 @@ class TrackViewHolder(parent: ViewGroup) :
             .into(artWork)
         nameTrack.text = track.trackName
         nameArtist.text = track.artistName
-        timeTrack.text = track.trackTime
+        timeTrack.text = millisToMin(track.trackTimeMillis)
+        nameArtist.requestLayout()
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
@@ -42,5 +45,10 @@ class TrackViewHolder(parent: ViewGroup) :
             dp,
             context.resources.displayMetrics
         ).toInt()
+    }
+
+    private fun millisToMin(millis: String): String {
+        val seconds = (millis.toInt() / 1000)
+        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
     }
 }

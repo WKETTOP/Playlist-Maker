@@ -43,10 +43,14 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.material)
+    implementation(libs.glide)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("com.github.bumptech.glide:glide:4.14.2")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
+    annotationProcessor(libs.glide.compiler)
+
 }

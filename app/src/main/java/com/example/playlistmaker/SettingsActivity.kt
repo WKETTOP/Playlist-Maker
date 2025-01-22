@@ -8,7 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
+
+private lateinit var themeSwitch: SwitchMaterial
+private lateinit var shareButton: MaterialTextView
+private lateinit var supportButton: MaterialTextView
+private lateinit var userAgreementButton: MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,13 +28,26 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val settingsToolbar = findViewById<Toolbar>(R.id.settings_toolbar)
-        val shareButton = findViewById<MaterialTextView>(R.id.share_button)
-        val supportButton = findViewById<MaterialTextView>(R.id.support_button)
-        val userAgreementButton = findViewById<MaterialTextView>(R.id.user_agreement_button)
+        themeSwitch = findViewById(R.id.dark_theme_switch)
+        shareButton = findViewById(R.id.share_button)
+        supportButton = findViewById(R.id.support_button)
+        userAgreementButton = findViewById(R.id.user_agreement_button)
 
         settingsToolbar.setNavigationOnClickListener {
             val backIntent = Intent(this, MainActivity::class.java)
             startActivity(backIntent)
+        }
+
+        val sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        val darkTheme = sharedPreferences.getBoolean(App.DARK_THEME_KEY, false)
+        themeSwitch.isChecked = darkTheme
+
+        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            (applicationContext as App).switchTheme(isChecked)
+
+            sharedPreferences.edit()
+                .putBoolean(App.DARK_THEME_KEY, isChecked)
+                .apply()
         }
 
         shareButton.setOnClickListener {

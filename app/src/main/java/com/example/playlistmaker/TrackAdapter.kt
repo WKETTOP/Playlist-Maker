@@ -3,8 +3,9 @@ package com.example.playlistmaker
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class TrackAdapter(private val searchHistory: TrackSearchHistory) :
-    RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(
+    private val searchHistory: TrackSearchHistory
+) : RecyclerView.Adapter<TrackViewHolder>() {
 
     var tracks = ArrayList<Track>()
 

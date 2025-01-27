@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -96,7 +95,8 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
         searchResult.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         searchResult.adapter = trackAdapter
 
-        historyRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        historyRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         historyRecyclerView.adapter = historyAdapter
 
         showTrackSearchHistory()
@@ -111,9 +111,9 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(inputTextEdit.windowToken, 0)
-            errorMessage.visibility = View.GONE
-            errorImage.visibility = View.GONE
-            refreshButton.visibility = View.GONE
+            errorMessage.isVisible = false
+            errorImage.isVisible = false
+            refreshButton.isVisible = false
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -128,14 +128,11 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
                 trackAdapter.notifyDataSetChanged()
                 if (s.isNullOrEmpty()) {
                     showHistorySearch()
-                } else {
-                    historyRecyclerView.visibility = View.GONE
-                }
-                if (inputTextEdit.hasFocus() && s?.isEmpty() == true) {
                     showTrackSearchHistory()
                 } else {
-                    findMessage.visibility = View.GONE
-                    clearTrackSearchHistory.visibility = View.GONE
+                    historyRecyclerView.isVisible = false
+                    findMessage.isVisible = false
+                    clearTrackSearchHistory.isVisible = false
                 }
             }
 
@@ -170,9 +167,10 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
 
         clearTrackSearchHistory.setOnClickListener {
             trackSearchHistory.clearTrackSearchHistory()
-            findMessage.visibility = View.GONE
-            searchResult.visibility = View.GONE
-            clearTrackSearchHistory.visibility = View.GONE
+            showTrackSearchHistory()
+            findMessage.isVisible = false
+            searchResult.isVisible = false
+            clearTrackSearchHistory.isVisible = false
         }
     }
 
@@ -193,33 +191,38 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
 
     private fun showError(text: String, additionalMessage: String) {
         if (text.isNotEmpty()) {
-            errorImage.visibility = View.VISIBLE
-            errorMessage.visibility = View.VISIBLE
+            errorImage.isVisible = true
+            errorMessage.isVisible = true
             tracks.clear()
             trackAdapter.notifyDataSetChanged()
             errorMessage.text = text
             when (additionalMessage.isEmpty()) {
                 true -> {
                     errorImage.setImageResource(R.drawable.nothing_found_120)
-                    refreshButton.visibility = View.GONE
+                    refreshButton.isVisible = false
                 }
 
                 false -> {
                     errorImage.setImageResource(R.drawable.download_failed_120)
-                    refreshButton.visibility = View.VISIBLE
+                    refreshButton.isVisible = true
                     Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
                 }
             }
         } else {
-            errorImage.visibility = View.GONE
-            errorMessage.visibility = View.GONE
-            refreshButton.visibility = View.GONE
+            errorImage.isVisible = false
+            errorMessage.isVisible = false
+            refreshButton.isVisible = false
         }
     }
 
     private fun performSearch(query: String) {
         lastSearchQuery = query
-        searchHistory.add(query)
+
+        searchHistory.add(0, query)
+        if (searchHistory.size > 3) {
+            searchHistory.removeAt(searchHistory.size - 1)
+        }
+
         itunesService.search(query).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(
                 call: Call<TracksResponse>,
@@ -257,10 +260,10 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
 
     private fun showHistorySearch() {
         if (searchHistory.isNotEmpty()) {
-            historyRecyclerView.visibility = View.VISIBLE
+            historyRecyclerView.isVisible = true
             historyAdapter.notifyDataSetChanged()
         } else {
-            historyRecyclerView.visibility = View.GONE
+            historyRecyclerView.isVisible = false
         }
     }
 
@@ -270,11 +273,11 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
         if (history.isNotEmpty()) {
             trackAdapter.updateData(ArrayList(history))
             findMessage.setText(R.string.find_line)
-            findMessage.visibility = View.VISIBLE
-            clearTrackSearchHistory.visibility = View.VISIBLE
+            findMessage.isVisible = true
+            clearTrackSearchHistory.isVisible = true
         } else {
-            findMessage.visibility = View.GONE
-            clearTrackSearchHistory.visibility = View.GONE
+            findMessage.isVisible = false
+            clearTrackSearchHistory.isVisible = false
         }
     }
 

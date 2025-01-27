@@ -25,7 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SearchActivity : AppCompatActivity(), TrackClickListener {
 
     companion object {
         const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
@@ -85,10 +85,11 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
         }
 
         sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
         trackSearchHistory = TrackSearchHistory(sharedPreferences)
 
         trackAdapter = TrackAdapter(trackSearchHistory)
+        trackAdapter.addObserver(this)
 
         trackAdapter.tracks = tracks
 
@@ -176,7 +177,7 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
 
     override fun onDestroy() {
         super.onDestroy()
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        trackAdapter.removeObserver(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -281,8 +282,8 @@ class SearchActivity : AppCompatActivity(), SharedPreferences.OnSharedPreference
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == TrackSearchHistory.HISTORY_KEY) {
+    override fun onTrackClicked(track: Track) {
+        if (inputTextEdit.text.isNullOrEmpty()) {
             showTrackSearchHistory()
         }
     }

@@ -7,6 +7,16 @@ class TrackAdapter(
     private val searchHistory: TrackSearchHistory
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
+    private val observers = mutableListOf<TrackClickListener>()
+
+    fun addObserver(observer: TrackClickListener) {
+        observers.add(observer)
+    }
+
+    fun removeObserver(observer: TrackClickListener) {
+        observers.remove(observer)
+    }
+
     var tracks = ArrayList<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -17,6 +27,9 @@ class TrackAdapter(
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
             searchHistory.saveTrack(tracks[position])
+            observers.forEach { observer ->
+                observer.onTrackClicked(tracks[position])
+            }
         }
     }
 

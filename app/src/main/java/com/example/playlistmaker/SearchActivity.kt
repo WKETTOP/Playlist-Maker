@@ -47,8 +47,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var errorImage: ImageView
     private lateinit var refreshButton: Button
     private lateinit var searchResult: RecyclerView
-    private lateinit var historyRecyclerView: RecyclerView
-    private lateinit var historyAdapter: HistoryAdapter
     private lateinit var trackSearchHistory: TrackSearchHistory
     private lateinit var findMessage: TextView
     private lateinit var clearTrackSearchHistory: Button
@@ -56,7 +54,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var sharedPreferences: SharedPreferences
 
     private val tracks = ArrayList<Track>()
-    private var searchHistory = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,14 +72,8 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         errorImage = findViewById(R.id.error_image)
         refreshButton = findViewById(R.id.refresh_button)
         searchResult = findViewById(R.id.search_result)
-        historyRecyclerView = findViewById(R.id.search_history)
         findMessage = findViewById(R.id.find_text)
         clearTrackSearchHistory = findViewById(R.id.clear_track_history_button)
-
-        historyAdapter = HistoryAdapter(searchHistory) { query ->
-            inputTextEdit.setText(query)
-            performSearch(query)
-        }
 
         sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
 
@@ -95,10 +86,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
 
         searchResult.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         searchResult.adapter = trackAdapter
-
-        historyRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        historyRecyclerView.adapter = historyAdapter
 
         showTrackSearchHistory()
 
@@ -128,10 +115,8 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 tracks.clear()
                 trackAdapter.notifyDataSetChanged()
                 if (s.isNullOrEmpty()) {
-                    showHistorySearch()
                     showTrackSearchHistory()
                 } else {
-                    historyRecyclerView.isVisible = false
                     findMessage.isVisible = false
                     clearTrackSearchHistory.isVisible = false
                 }
@@ -219,11 +204,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private fun performSearch(query: String) {
         lastSearchQuery = query
 
-        searchHistory.add(0, query)
-        if (searchHistory.size > 3) {
-            searchHistory.removeAt(searchHistory.size - 1)
-        }
-
         itunesService.search(query).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(
                 call: Call<TracksResponse>,
@@ -257,15 +237,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 showError(getString(R.string.communication_problems), t.message.toString())
             }
         })
-    }
-
-    private fun showHistorySearch() {
-        if (searchHistory.isNotEmpty()) {
-            historyRecyclerView.isVisible = true
-            historyAdapter.notifyDataSetChanged()
-        } else {
-            historyRecyclerView.isVisible = false
-        }
     }
 
     private fun showTrackSearchHistory() {

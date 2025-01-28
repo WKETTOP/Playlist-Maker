@@ -27,9 +27,6 @@ class TrackAdapter(
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
             searchHistory.saveTrack(tracks[position])
-            observers.forEach { observer ->
-                observer.onTrackClicked(tracks[position])
-            }
         }
     }
 

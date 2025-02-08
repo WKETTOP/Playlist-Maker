@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Intent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
@@ -27,6 +28,11 @@ class TrackAdapter(
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
             searchHistory.saveTrack(tracks[position])
+            val context = holder.itemView.context
+            val trackIntent = Intent(context, TrackActivity::class.java).apply {
+                putExtra("TRACK", tracks[position])
+            }
+            context.startActivity(trackIntent)
         }
     }
 

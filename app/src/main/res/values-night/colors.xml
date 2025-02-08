@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
      <color name="blue_night">#1A1B22</color>
-     <color name="grey">#FFFFFFFF</color>
      <color name="black_night">#FFFFFFFF</color>
      <color name="white_night">#1A1B22</color>
      <color name="grey_white">#FFFFFF</color>

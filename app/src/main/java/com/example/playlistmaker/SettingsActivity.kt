@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
@@ -43,11 +44,13 @@ class SettingsActivity : AppCompatActivity() {
         themeSwitch.isChecked = darkTheme
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            (applicationContext as App).switchTheme(isChecked)
-
-            sharedPreferences.edit()
-                .putBoolean(App.DARK_THEME_KEY, isChecked)
-                .apply()
+            if (isChecked != darkTheme) {
+                (applicationContext as App).switchTheme(isChecked)
+                sharedPreferences.edit()
+                    .putBoolean(App.DARK_THEME_KEY, isChecked)
+                    .apply()
+            }
+            recreate()
         }
 
         shareButton.setOnClickListener {
@@ -79,5 +82,9 @@ class SettingsActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(urlUserAgreement))
             startActivity(browserIntent)
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 }

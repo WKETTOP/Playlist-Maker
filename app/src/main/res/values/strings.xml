@@ -19,4 +19,9 @@
     <string name="refresh_line">Refresh</string>
     <string name="find_line">You were looking for</string>
     <string name="clear_track_history_line">Clear the history</string>
+    <string name="duration_line">Duration</string>
+    <string name="album_line">Album</string>
+    <string name="year_line">Year</string>
+    <string name="genre_line">Genre</string>
+    <string name="country_line">Country</string>
 </resources>

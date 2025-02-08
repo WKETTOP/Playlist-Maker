@@ -10,7 +10,7 @@ class App : Application() {
         const val DARK_THEME_KEY = "dark_theme_key"
     }
 
-    var darkTheme = false
+    private var darkTheme = false
 
     override fun onCreate() {
         super.onCreate()
@@ -28,5 +28,6 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+
     }
 }

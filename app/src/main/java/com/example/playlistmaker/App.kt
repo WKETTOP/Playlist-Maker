@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 
 class App : Application() {
@@ -11,7 +10,7 @@ class App : Application() {
         const val DARK_THEME_KEY = "dark_theme_key"
     }
 
-    private var darkTheme = false
+   private var darkTheme = false
 
     override fun onCreate() {
         super.onCreate()
@@ -29,7 +28,5 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-        Log.d("switchTheme", "Theme switch ${if (darkThemeEnabled) "DARK" else "LIGHT"}")
     }
-
 }

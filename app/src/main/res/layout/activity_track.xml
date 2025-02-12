@@ -26,11 +26,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:layout_constraintBottom_toTopOf="@id/art_work"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/art_work"/>
+        app:navigationIcon="@drawable/ic_arrow_back_24" />
 
     <ImageView
         android:id="@+id/art_work"
@@ -83,10 +83,11 @@
 
     <ImageButton
         android:id="@+id/add_button"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="51dp"
-        android:layout_height="51dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_30"
+        android:background="@color/white_night"
+        android:padding="@null"
         android:src="@drawable/add_button_51"
         app:layout_constraintBottom_toTopOf="@id/track_time"
         app:layout_constraintEnd_toStartOf="@+id/play_button"
@@ -96,10 +97,11 @@
 
     <ImageButton
         android:id="@+id/play_button"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_30"
+        android:background="@color/white_night"
+        android:padding="@null"
         android:src="@drawable/play_button_100"
         app:layout_constraintBottom_toBottomOf="@+id/add_button"
         app:layout_constraintBottom_toTopOf="@id/track_time"
@@ -109,10 +111,11 @@
 
     <ImageButton
         android:id="@+id/favorite_button"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="51dp"
-        android:layout_height="51dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_30"
+        android:background="@color/white_night"
+        android:padding="@null"
         android:src="@drawable/favorite_button_51"
         app:layout_constraintBottom_toTopOf="@id/track_time"
         app:layout_constraintEnd_toEndOf="@id/right_border"

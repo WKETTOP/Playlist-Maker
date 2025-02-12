@@ -11,13 +11,16 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
-private lateinit var themeSwitch: SwitchMaterial
-private lateinit var shareButton: MaterialTextView
-private lateinit var supportButton: MaterialTextView
-private lateinit var userAgreementButton: MaterialTextView
-
-
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var settingsToolbar: Toolbar
+    private lateinit var themeSwitch: SwitchMaterial
+    private lateinit var shareButton: MaterialTextView
+    private lateinit var supportButton: MaterialTextView
+    private lateinit var userAgreementButton: MaterialTextView
+
+    private var isUserInteract = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,7 +31,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val settingsToolbar = findViewById<Toolbar>(R.id.settings_toolbar)
+        settingsToolbar = findViewById(R.id.settings_toolbar)
         themeSwitch = findViewById(R.id.dark_theme_switch)
         shareButton = findViewById(R.id.share_button)
         supportButton = findViewById(R.id.support_button)
@@ -44,14 +47,13 @@ class SettingsActivity : AppCompatActivity() {
         themeSwitch.isChecked = darkTheme
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked != darkTheme) {
+            if (isUserInteract) {
                 sharedPreferences.edit()
                     .putBoolean(App.DARK_THEME_KEY, isChecked)
                     .apply()
                 (applicationContext as App).switchTheme(isChecked)
             }
         }
-
 
         shareButton.setOnClickListener {
             val urlAndroidDev = getString(R.string.url_android_dev)
@@ -82,5 +84,15 @@ class SettingsActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(urlUserAgreement))
             startActivity(browserIntent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isUserInteract = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isUserInteract = false
     }
 }

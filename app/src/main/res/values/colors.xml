@@ -6,11 +6,12 @@
     <color name="blue_night">#3772E7</color>
     <color name="switch_track_inactive_color">#FFE6E8EB</color>
     <color name="switch_track_active_color">#9FBBF3</color>
-    <color name="grey">#AEAFB4</color>
     <color name="black_night">#1A1B22</color>
     <color name="white_night">#FFFFFFFF</color>
     <color name="switch_thumb_inactive_color">#FFAEAFB4</color>
     <color name="switch_thumb_active_color">#FF3772E7</color>
+    <color name="grey">#AEAFB4</color>
+    <color name="grey_25">#AEAFB4</color>
     <color name="grey_night">#AEAFB4</color>
     <color name="grey_white">#AEAFB4</color>
     <color name="grey_black">#AEAFB4</color>

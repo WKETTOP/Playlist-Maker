@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.app.Application
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 
 class App : Application() {
@@ -28,6 +29,7 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-
+        Log.d("switchTheme", "Theme switch ${if (darkThemeEnabled) "DARK" else "LIGHT"}")
     }
+
 }

@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
@@ -16,6 +15,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class TrackActivity : AppCompatActivity() {
+
+    companion object {
+        const val TRACK_READ = "TRACK"
+    }
 
     private lateinit var backButton: Toolbar
     private lateinit var artWork: ImageView
@@ -34,7 +37,7 @@ class TrackActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.track_activity)
+        setContentView(R.layout.activity_track)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.big_track_view)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -61,10 +64,10 @@ class TrackActivity : AppCompatActivity() {
         }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("TRACK", Track::class.java)
+            intent.getParcelableExtra(TRACK_READ, Track::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra("TRACK")
+            intent.getParcelableExtra(TRACK_READ)
         }
 
         if (track != null) {
@@ -87,10 +90,5 @@ class TrackActivity : AppCompatActivity() {
             genreValue.text = track.primaryGenreName
             countryValue.text = track.country
         }
-
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
     }
 }

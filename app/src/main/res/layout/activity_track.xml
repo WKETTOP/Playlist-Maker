@@ -84,8 +84,8 @@
     <ImageButton
         android:id="@+id/add_button"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="51dp"
+        android:layout_height="51dp"
         android:layout_marginTop="@dimen/padding_30"
         android:src="@drawable/add_button_51"
         app:layout_constraintBottom_toTopOf="@id/track_time"
@@ -97,8 +97,8 @@
     <ImageButton
         android:id="@+id/play_button"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="@dimen/padding_30"
         android:src="@drawable/play_button_100"
         app:layout_constraintBottom_toBottomOf="@+id/add_button"
@@ -110,8 +110,8 @@
     <ImageButton
         android:id="@+id/favorite_button"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="51dp"
+        android:layout_height="51dp"
         android:layout_marginTop="@dimen/padding_30"
         android:src="@drawable/favorite_button_51"
         app:layout_constraintBottom_toTopOf="@id/track_time"

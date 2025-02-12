@@ -1,13 +1,14 @@
 package com.example.playlistmaker
 
-import android.content.Intent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class TrackAdapter(
-    private val searchHistory: TrackSearchHistory
+    private val searchHistory: TrackSearchHistory,
+    private val clickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
+    var tracks = ArrayList<Track>()
     private val observers = mutableListOf<TrackClickListener>()
 
     fun addObserver(observer: TrackClickListener) {
@@ -18,8 +19,6 @@ class TrackAdapter(
         observers.remove(observer)
     }
 
-    var tracks = ArrayList<Track>()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         return TrackViewHolder(parent)
     }
@@ -28,11 +27,7 @@ class TrackAdapter(
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
             searchHistory.saveTrack(tracks[position])
-            val context = holder.itemView.context
-            val trackIntent = Intent(context, TrackActivity::class.java).apply {
-                putExtra("TRACK", tracks[position])
-            }
-            context.startActivity(trackIntent)
+            clickListener(tracks[position])
         }
     }
 

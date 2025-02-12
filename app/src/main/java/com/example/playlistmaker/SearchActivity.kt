@@ -3,7 +3,6 @@ package com.example.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -80,7 +79,9 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
 
         trackSearchHistory = TrackSearchHistory(sharedPreferences)
 
-        trackAdapter = TrackAdapter(trackSearchHistory)
+        trackAdapter = TrackAdapter(trackSearchHistory) {track ->
+            onTrackClicked(track)
+        }
         trackAdapter.addObserver(this)
 
         trackAdapter.tracks = tracks
@@ -164,10 +165,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     override fun onDestroy() {
         super.onDestroy()
         trackAdapter.removeObserver(this)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -262,5 +259,10 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         if (inputTextEdit.text.isNullOrEmpty()) {
             showTrackSearchHistory()
         }
+
+        val trackIntent = Intent(this, TrackActivity::class.java).apply {
+            putExtra("TRACK", track)
+        }
+        startActivity(trackIntent)
     }
 }

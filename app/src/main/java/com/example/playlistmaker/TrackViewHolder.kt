@@ -1,8 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.Context
-import android.icu.text.SimpleDateFormat
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -10,7 +7,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import java.util.Locale
 
 class TrackViewHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(
@@ -24,31 +20,19 @@ class TrackViewHolder(parent: ViewGroup) :
 
     fun bind(track: Track) {
 
-        val cornerRadiusInDp = 2f
-        val cornerRadiusInPx = dpToPx(cornerRadiusInDp, itemView.context)
+        val cornerRadius = Transform.dpToPx(2f, itemView.context)
+        val formatTime = Transform.millisToMin(track.trackTimeMillis)
 
         Glide.with(itemView)
             .load(track.artworkUrl100)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
-            .transform(RoundedCorners(cornerRadiusInPx))
+            .transform(RoundedCorners(cornerRadius))
             .into(artWork)
         nameTrack.text = track.trackName
         nameArtist.text = track.artistName
-        timeTrack.text = millisToMin(track.trackTimeMillis)
+        timeTrack.text = formatTime
         nameArtist.requestLayout()
     }
 
-    private fun dpToPx(dp: Float, context: Context): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            context.resources.displayMetrics
-        ).toInt()
-    }
-
-    private fun millisToMin(millis: String): String {
-        val seconds = (millis.toInt() / 1000)
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
-    }
 }

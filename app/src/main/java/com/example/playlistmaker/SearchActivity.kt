@@ -79,7 +79,9 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
 
         trackSearchHistory = TrackSearchHistory(sharedPreferences)
 
-        trackAdapter = TrackAdapter(trackSearchHistory)
+        trackAdapter = TrackAdapter(trackSearchHistory) {track ->
+            onTrackClicked(track)
+        }
         trackAdapter.addObserver(this)
 
         trackAdapter.tracks = tracks
@@ -257,5 +259,10 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         if (inputTextEdit.text.isNullOrEmpty()) {
             showTrackSearchHistory()
         }
+
+        val trackIntent = Intent(this, TrackActivity::class.java).apply {
+            putExtra("TRACK", track)
+        }
+        startActivity(trackIntent)
     }
 }

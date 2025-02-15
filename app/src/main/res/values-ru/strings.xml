@@ -16,4 +16,9 @@
     <string name="refresh_line">Обновить</string>
     <string name="find_line">Вы искали</string>
     <string name="clear_track_history_line">Очистить историю</string>
+    <string name="duration_line">Длительность</string>
+    <string name="album_line">Альбом</string>
+    <string name="year_line">Год</string>
+    <string name="genre_line">Genre</string>
+    <string name="country_line">Страна</string>
 </resources>

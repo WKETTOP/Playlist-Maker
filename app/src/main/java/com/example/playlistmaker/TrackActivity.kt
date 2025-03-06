@@ -173,11 +173,11 @@ class TrackActivity : AppCompatActivity() {
     private fun playerControl() {
         when (playerState) {
             STATE_PLAYING -> {
-                startPlayer()
+                pausePlayer()
             }
 
             STATE_PREPARED, STATE_PAUSED -> {
-                pausePlayer()
+                startPlayer()
             }
         }
     }

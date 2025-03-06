@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
@@ -11,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -30,6 +33,20 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     companion object {
         const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
         const val TEXT_DEF = ""
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+    }
+
+    private var isTrackClickAllowed = true
+
+    private var handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable {
+        val query = inputTextEdit.text.toString().trim()
+        if (query.isNotEmpty()) {
+            performSearch(query)
+        } else {
+            showTrackSearchHistory()
+        }
     }
 
     private var textInputValue: String = TEXT_DEF
@@ -52,6 +69,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var clearTrackSearchHistory: Button
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var searchProgress: ProgressBar
 
     private val tracks = ArrayList<Track>()
 
@@ -74,13 +92,16 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         searchResult = findViewById(R.id.search_result)
         findMessage = findViewById(R.id.find_text)
         clearTrackSearchHistory = findViewById(R.id.clear_track_history_button)
+        searchProgress = findViewById(R.id.search_progress)
 
         sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
 
         trackSearchHistory = TrackSearchHistory(sharedPreferences)
 
-        trackAdapter = TrackAdapter(trackSearchHistory) {track ->
-            onTrackClicked(track)
+        trackAdapter = TrackAdapter(trackSearchHistory) { track ->
+            if (trackClickDebounce()) {
+                onTrackClicked(track)
+            }
         }
         trackAdapter.addObserver(this)
 
@@ -117,10 +138,15 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 tracks.clear()
                 trackAdapter.notifyDataSetChanged()
                 if (s.isNullOrEmpty()) {
+                    handler.removeCallbacks(searchRunnable)
                     showTrackSearchHistory()
+                    errorImage.isVisible = false
+                    errorMessage.isVisible = false
+                    refreshButton.isVisible = false
                 } else {
                     findMessage.isVisible = false
                     clearTrackSearchHistory.isVisible = false
+                    searchDebounce()
                 }
             }
 
@@ -129,6 +155,12 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
             }
         }
         inputTextEdit.addTextChangedListener(simpleTextWatcher)
+
+        inputTextEdit.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && inputTextEdit.text.isEmpty()) {
+                showTrackSearchHistory()
+            }
+        }
 
         inputTextEdit.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -139,12 +171,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 true
             }
             false
-        }
-
-        inputTextEdit.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && inputTextEdit.text.isEmpty()) {
-                showTrackSearchHistory()
-            }
         }
 
         refreshButton.setOnClickListener {
@@ -204,13 +230,14 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     }
 
     private fun performSearch(query: String) {
+        searchProgress.isVisible = true
         lastSearchQuery = query
-
         itunesService.search(query).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(
                 call: Call<TracksResponse>,
                 response: Response<TracksResponse>
             ) {
+                searchProgress.isVisible = false
                 if (response.isSuccessful) {
                     tracks.clear()
                     response.body()?.results?.let { results ->
@@ -236,6 +263,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
             }
 
             override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                searchProgress.isVisible = false
                 showError(getString(R.string.communication_problems), t.message.toString())
             }
         })
@@ -264,5 +292,19 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
             putExtra("TRACK", track)
         }
         startActivity(trackIntent)
+    }
+
+    private fun trackClickDebounce(): Boolean {
+        val current = isTrackClickAllowed
+        if (isTrackClickAllowed) {
+            isTrackClickAllowed = false
+            handler.postDelayed({ isTrackClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 }

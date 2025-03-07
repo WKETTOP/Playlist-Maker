@@ -120,13 +120,22 @@
             android:visibility="gone"
             tools:text="@string/find_line" />
 
+        <ProgressBar
+            android:id="@+id/search_progress"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="140dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/blue"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_result"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/icon_24"
             android:layout_weight="1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
         <Button
             android:id="@+id/clear_track_history_button"

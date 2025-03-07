@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
@@ -19,8 +20,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var supportButton: MaterialTextView
     private lateinit var userAgreementButton: MaterialTextView
 
-    private var isUserInteract = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,21 +37,7 @@ class SettingsActivity : AppCompatActivity() {
         userAgreementButton = findViewById(R.id.user_agreement_button)
 
         settingsToolbar.setNavigationOnClickListener {
-            val backIntent = Intent(this, MainActivity::class.java)
-            startActivity(backIntent)
-        }
-
-        val sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        val darkTheme = sharedPreferences.getBoolean(App.DARK_THEME_KEY, false)
-        themeSwitch.isChecked = darkTheme
-
-        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isUserInteract) {
-                sharedPreferences.edit()
-                    .putBoolean(App.DARK_THEME_KEY, isChecked)
-                    .apply()
-                (applicationContext as App).switchTheme(isChecked)
-            }
+            finish()
         }
 
         shareButton.setOnClickListener {
@@ -88,11 +73,23 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        isUserInteract = true
+
+        val app = applicationContext as App
+        val currentMode = app.getCurrentTheme()
+
+        themeSwitch.isChecked = when (currentMode) {
+            "dark" -> true
+            "light" -> false
+            else -> isSystemInDarkMode()
+        }
+
+        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val newMode = if (isChecked) "dark" else "light"
+            app.switchTheme(newMode)
+        }
     }
 
-    override fun onStart() {
-        super.onStart()
-        isUserInteract = false
+    private fun isSystemInDarkMode(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 }

@@ -18,8 +18,12 @@ object Transform {
     }
 
     fun millisToMin(millis: String): String {
-        val seconds = (millis.toInt() / 1000)
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
+        return try {
+            val seconds = (millis.toInt() / 1000)
+            SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
+        } catch (e: NumberFormatException) {
+            "00:00"
+        }
     }
 
     fun dateToYear(date: String): String {
@@ -32,5 +36,4 @@ object Transform {
             "Unknown"
         }
     }
-
 }

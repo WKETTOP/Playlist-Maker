@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
@@ -34,9 +33,9 @@ class TrackActivity : AppCompatActivity() {
 
     private var handler = Handler(Looper.getMainLooper())
     private var trackCurrentPosition: Int = 0
-    private lateinit var trackTimeRunnable: Runnable
     private var trackFullTime: String = "0"
 
+    private lateinit var trackTimeRunnable: Runnable
     private lateinit var url: String
 
     private lateinit var backButton: Toolbar
@@ -78,8 +77,7 @@ class TrackActivity : AppCompatActivity() {
         countryValue = findViewById(R.id.country_value)
 
         backButton.setNavigationOnClickListener {
-            val backIntent = Intent(this, SearchActivity::class.java)
-            startActivity(backIntent)
+            finish()
         }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

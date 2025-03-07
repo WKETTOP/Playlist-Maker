@@ -113,8 +113,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         showTrackSearchHistory()
 
         searchToolbar.setNavigationOnClickListener {
-            val backIntent = Intent(this, MainActivity::class.java)
-            startActivity(backIntent)
+            finish()
         }
 
         clearButton.setOnClickListener {

@@ -17,5 +17,4 @@ class MediaLibraryActivity : AppCompatActivity() {
             insets
         }
     }
-
 }

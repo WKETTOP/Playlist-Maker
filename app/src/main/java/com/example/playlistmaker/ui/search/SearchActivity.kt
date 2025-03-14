@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -24,6 +23,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.ui.App
+import com.example.playlistmaker.data.network.ItunesApi
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.ui.track.TrackActivity
+import com.example.playlistmaker.presentation.TrackClickListener
+import com.example.playlistmaker.data.dto.SharedPreferencesTrackSearchHistory
+import com.example.playlistmaker.data.dto.TracksSearchResponse
+import com.example.playlistmaker.domain.api.TracksInteractor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,11 +61,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private var textInputValue: String = TEXT_DEF
     private var lastSearchQuery: String? = null
 
-
-    private val itunesService: ItunesApi by lazy {
-        RetrofitClient.getApiService()
-    }
-
     private lateinit var searchToolbar: Toolbar
     private lateinit var inputTextEdit: EditText
     private lateinit var clearButton: ImageView
@@ -64,12 +68,13 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var errorImage: ImageView
     private lateinit var refreshButton: Button
     private lateinit var searchResult: RecyclerView
-    private lateinit var trackSearchHistory: TrackSearchHistory
+    private lateinit var sharedPreferencesTrackSearchHistory: SharedPreferencesTrackSearchHistory
     private lateinit var findMessage: TextView
     private lateinit var clearTrackSearchHistory: Button
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var searchProgress: ProgressBar
+    private lateinit var tracksInteractor: TracksInteractor
 
     private val tracks = ArrayList<Track>()
 
@@ -94,11 +99,13 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         clearTrackSearchHistory = findViewById(R.id.clear_track_history_button)
         searchProgress = findViewById(R.id.search_progress)
 
+        tracksInteractor = Creator.provideTracksInteractor(this)
+
         sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
 
-        trackSearchHistory = TrackSearchHistory(sharedPreferences)
+        sharedPreferencesTrackSearchHistory = SharedPreferencesTrackSearchHistory(this)
 
-        trackAdapter = TrackAdapter(trackSearchHistory) { track ->
+        trackAdapter = TrackAdapter(sharedPreferencesTrackSearchHistory) { track ->
             if (trackClickDebounce()) {
                 onTrackClicked(track)
             }
@@ -119,7 +126,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         clearButton.setOnClickListener {
             inputTextEdit.setText("")
             val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(inputTextEdit.windowToken, 0)
             errorMessage.isVisible = false
             errorImage.isVisible = false
@@ -179,7 +186,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         }
 
         clearTrackSearchHistory.setOnClickListener {
-            trackSearchHistory.clearTrackSearchHistory()
+            tracksInteractor.clearTrackSearchHistory()
             showTrackSearchHistory()
             findMessage.isVisible = false
             searchResult.isVisible = false
@@ -231,45 +238,45 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private fun performSearch(query: String) {
         searchProgress.isVisible = true
         lastSearchQuery = query
-        itunesService.search(query).enqueue(object : Callback<TracksResponse> {
-            override fun onResponse(
-                call: Call<TracksResponse>,
-                response: Response<TracksResponse>
-            ) {
-                searchProgress.isVisible = false
-                if (response.isSuccessful) {
-                    tracks.clear()
-                    response.body()?.results?.let { results ->
-                        if (results.isNotEmpty()) {
-                            tracks.addAll(results)
-                            trackAdapter.notifyDataSetChanged()
-                            showError("", "")
-                        } else {
-                            showError(getString(R.string.nothing_found), "")
-                        }
-                    } ?: run {
-                        showError(
-                            getString(R.string.communication_problems),
-                            response.code().toString()
-                        )
-                    }
-                } else {
-                    showError(
-                        getString(R.string.communication_problems),
-                        response.code().toString()
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                searchProgress.isVisible = false
-                showError(getString(R.string.communication_problems), t.message.toString())
-            }
-        })
+//        tracksInteractor.searchTrack(query).enqueue(object : Callback<TracksSearchResponse> {
+//            override fun onResponse(
+//                call: Call<TracksSearchResponse>,
+//                response: Response<TracksSearchResponse>
+//            ) {
+//                searchProgress.isVisible = false
+//                if (response.isSuccessful) {
+//                    tracks.clear()
+//                    response.body()?.results?.let { results ->
+//                        if (results.isNotEmpty()) {
+//                            tracks.addAll(results)
+//                            trackAdapter.notifyDataSetChanged()
+//                            showError("", "")
+//                        } else {
+//                            showError(getString(R.string.nothing_found), "")
+//                        }
+//                    } ?: run {
+//                        showError(
+//                            getString(R.string.communication_problems),
+//                            response.code().toString()
+//                        )
+//                    }
+//                } else {
+//                    showError(
+//                        getString(R.string.communication_problems),
+//                        response.code().toString()
+//                    )
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
+//                searchProgress.isVisible = false
+//                showError(getString(R.string.communication_problems), t.message.toString())
+//            }
+//        })
     }
 
     private fun showTrackSearchHistory() {
-        val history = trackSearchHistory.getTrackSearchHistory()
+        val history = tracksInteractor.getTrackSearchHistory()
 
         if (history.isNotEmpty()) {
             trackAdapter.updateData(ArrayList(history))

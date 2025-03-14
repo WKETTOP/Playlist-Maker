@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.domain.impl
 
 import android.content.Context
 import android.icu.text.SimpleDateFormat
@@ -15,15 +15,6 @@ object Transform {
             dp,
             context.resources.displayMetrics
         ).toInt()
-    }
-
-    fun millisToMin(millis: String): String {
-        return try {
-            val seconds = (millis.toInt() / 1000)
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
-        } catch (e: NumberFormatException) {
-            "00:00"
-        }
     }
 
     fun dateToYear(date: String): String {

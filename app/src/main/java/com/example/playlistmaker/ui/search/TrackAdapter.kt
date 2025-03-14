@@ -1,10 +1,13 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.presentation.TrackClickListener
+import com.example.playlistmaker.data.dto.SharedPreferencesTrackSearchHistory
+import com.example.playlistmaker.domain.models.Track
 
 class TrackAdapter(
-    private val searchHistory: TrackSearchHistory,
+    private val searchHistory: SharedPreferencesTrackSearchHistory,
     private val clickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 

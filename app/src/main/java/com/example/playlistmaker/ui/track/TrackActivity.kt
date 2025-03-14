@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.track
 
 import android.media.MediaPlayer
 import android.os.Build
@@ -15,6 +15,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.impl.Transform
 
 class TrackActivity : AppCompatActivity() {
 
@@ -88,8 +91,6 @@ class TrackActivity : AppCompatActivity() {
         }
 
         if (track != null) {
-            trackFullTime = track.trackTimeMillis
-            val formatTimeTrack = Transform.millisToMin(trackFullTime)
             val cornerRadiusTrack = Transform.dpToPx(8f, this)
             val yearTrack = Transform.dateToYear(track.releaseDate)
 
@@ -103,8 +104,8 @@ class TrackActivity : AppCompatActivity() {
                 .into(artWork)
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = formatTimeTrack
-            durationValue.text = formatTimeTrack
+            trackTime.text = track.formattedTrackTime
+            durationValue.text = track.formattedTrackTime
             albumValue.text = track.collectionName
             yearValue.text = yearTrack
             genreValue.text = track.primaryGenreName
@@ -121,7 +122,7 @@ class TrackActivity : AppCompatActivity() {
             override fun run() {
                 if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
                     trackCurrentPosition = mediaPlayer.currentPosition
-                    trackTime.text = Transform.millisToMin(trackCurrentPosition.toString())
+                    trackTime.text = trackCurrentPosition.toString()
                     handler.postDelayed(this, TRACK_PLAYING_DELAY)
                 }
             }
@@ -150,7 +151,7 @@ class TrackActivity : AppCompatActivity() {
             playButton.setImageResource(R.drawable.play_button_100)
             playerState = STATE_PREPARED
             handler.removeCallbacks(trackTimeRunnable)
-            trackTime.text = Transform.millisToMin(trackFullTime)
+            trackTime.text = trackFullTime
         }
     }
 

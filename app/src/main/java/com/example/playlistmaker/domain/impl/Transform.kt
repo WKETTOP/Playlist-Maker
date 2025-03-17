@@ -17,6 +17,15 @@ object Transform {
         ).toInt()
     }
 
+    fun millisToMin(millis: String): String {
+        return try {
+            val seconds = (millis.toInt() / 1000)
+            SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
+        } catch (e: NumberFormatException) {
+            "00:00"
+        }
+    }
+
     fun dateToYear(date: String): String {
         return try {
             val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")

@@ -92,7 +92,6 @@ class TrackActivity : AppCompatActivity() {
 
         if (track != null) {
             val cornerRadiusTrack = Transform.dpToPx(8f, this)
-            val yearTrack = Transform.dateToYear(track.releaseDate)
 
             url = track.previewUrl
 
@@ -107,7 +106,7 @@ class TrackActivity : AppCompatActivity() {
             trackTime.text = track.formattedTrackTime
             durationValue.text = track.formattedTrackTime
             albumValue.text = track.collectionName
-            yearValue.text = yearTrack
+            yearValue.text = track.formattedReleaseDate
             genreValue.text = track.primaryGenreName
             countryValue.text = track.country
         }
@@ -122,11 +121,12 @@ class TrackActivity : AppCompatActivity() {
             override fun run() {
                 if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
                     trackCurrentPosition = mediaPlayer.currentPosition
-                    trackTime.text = trackCurrentPosition.toString()
+                    trackTime.text = Transform.millisToMin(trackCurrentPosition.toString())
                     handler.postDelayed(this, TRACK_PLAYING_DELAY)
                 }
             }
         }
+
     }
 
     override fun onPause() {
@@ -139,6 +139,7 @@ class TrackActivity : AppCompatActivity() {
         handler.removeCallbacks(trackTimeRunnable)
         mediaPlayer.release()
     }
+
 
     private fun preparePlayer() {
         mediaPlayer.setDataSource(url)

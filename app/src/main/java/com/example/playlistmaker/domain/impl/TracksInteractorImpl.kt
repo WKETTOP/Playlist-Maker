@@ -13,9 +13,17 @@ class TracksInteractorImpl(
 
     private val executor = Executors.newCachedThreadPool()
 
-    override fun searchTrack(expression: String, consumer: TracksInteractor.TracksConsumer) {
+    override fun searchTrack(
+        expression: String,
+        consumer: TracksInteractor.TracksConsumer,
+        errorConsumer: TracksInteractor.ErrorConsumer
+    ) {
         executor.execute {
-            consumer.consume(repository.searchTrack(expression))
+            try {
+                consumer.consume(repository.searchTrack(expression))
+            } catch (e: Exception) {
+                errorConsumer.consume(e.message ?: "Unknown error")
+            }
         }
     }
 
@@ -24,7 +32,7 @@ class TracksInteractorImpl(
     }
 
     override fun saveTrack(track: Track) {
-       trackSearchHistory.saveTrack(track)
+        trackSearchHistory.saveTrack(track)
     }
 
     override fun clearTrackSearchHistory() {

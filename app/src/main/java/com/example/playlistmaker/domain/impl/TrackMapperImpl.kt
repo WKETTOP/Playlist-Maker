@@ -4,6 +4,8 @@ import android.icu.text.SimpleDateFormat
 import com.example.playlistmaker.data.dto.TrackDto
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.models.TrackMapper
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class TrackMapperImpl : TrackMapper {
@@ -13,22 +15,14 @@ class TrackMapperImpl : TrackMapper {
             trackId = trackDto.trackId,
             trackName = trackDto.trackName,
             artistName = trackDto.artistName,
-            formattedTrackTime = millisToMin(trackDto.trackTimeMillis),
+            formattedTrackTime = Transform.millisToMin(trackDto.trackTimeMillis),
             artworkUrl100 = trackDto.artworkUrl100,
             collectionName = trackDto.collectionName,
-            releaseDate = trackDto.releaseDate,
+            formattedReleaseDate = Transform.dateToYear(trackDto.releaseDate),
             primaryGenreName = trackDto.primaryGenreName,
             country = trackDto.country,
             previewUrl = trackDto.previewUrl
         )
     }
 
-    private fun millisToMin(millis: String): String {
-        return try {
-            val seconds = (millis.toInt() / 1000)
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000L)
-        } catch (e: NumberFormatException) {
-            "00:00"
-        }
-    }
 }

@@ -24,6 +24,7 @@ class SharedPreferencesTrackSearchHistory(private val context: Context) : TrackS
 
 
     override fun saveTrack(track: Track) {
+        val prefs = context.getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
         val historyTrack = getTrackSearchHistory()
 
         historyTrack.removeAll { it.trackId == track.trackId }
@@ -33,11 +34,10 @@ class SharedPreferencesTrackSearchHistory(private val context: Context) : TrackS
             historyTrack.removeAt(historyTrack.size - 1)
         }
 
-        saveTrackSearchHistory(historyTrack)
+        saveTrackSearchHistory(historyTrack, prefs)
     }
 
-    private fun saveTrackSearchHistory(trackHistory: ArrayList<Track>) {
-        val prefs = context.getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
+    private fun saveTrackSearchHistory(trackHistory: ArrayList<Track>, prefs: SharedPreferences) {
         val json = Gson().toJson(trackHistory)
         prefs.edit()
             .putString(HISTORY_KEY, json)

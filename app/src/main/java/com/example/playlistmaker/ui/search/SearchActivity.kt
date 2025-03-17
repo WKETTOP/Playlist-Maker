@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.search
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,18 +23,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.ui.App
-import com.example.playlistmaker.data.network.ItunesApi
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.ui.track.TrackActivity
 import com.example.playlistmaker.presentation.TrackClickListener
 import com.example.playlistmaker.data.dto.SharedPreferencesTrackSearchHistory
-import com.example.playlistmaker.data.dto.TracksSearchResponse
 import com.example.playlistmaker.domain.api.TracksInteractor
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchActivity : AppCompatActivity(), TrackClickListener {
 
@@ -72,7 +65,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var findMessage: TextView
     private lateinit var clearTrackSearchHistory: Button
     private lateinit var trackAdapter: TrackAdapter
-    private lateinit var sharedPreferences: SharedPreferences
+//    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var searchProgress: ProgressBar
     private lateinit var tracksInteractor: TracksInteractor
 
@@ -101,11 +94,9 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
 
         tracksInteractor = Creator.provideTracksInteractor(this)
 
-        sharedPreferences = getSharedPreferences(App.PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-
         sharedPreferencesTrackSearchHistory = SharedPreferencesTrackSearchHistory(this)
 
-        trackAdapter = TrackAdapter(sharedPreferencesTrackSearchHistory) { track ->
+        trackAdapter = TrackAdapter { track ->
             if (trackClickDebounce()) {
                 onTrackClicked(track)
             }
@@ -146,9 +137,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
                     showTrackSearchHistory()
-                    errorImage.isVisible = false
-                    errorMessage.isVisible = false
-                    refreshButton.isVisible = false
+                    clearErrorState()
                 } else {
                     findMessage.isVisible = false
                     clearTrackSearchHistory.isVisible = false
@@ -229,50 +218,38 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
                 }
             }
         } else {
-            errorImage.isVisible = false
-            errorMessage.isVisible = false
-            refreshButton.isVisible = false
+            clearErrorState()
         }
     }
 
     private fun performSearch(query: String) {
         searchProgress.isVisible = true
         lastSearchQuery = query
-//        tracksInteractor.searchTrack(query).enqueue(object : Callback<TracksSearchResponse> {
-//            override fun onResponse(
-//                call: Call<TracksSearchResponse>,
-//                response: Response<TracksSearchResponse>
-//            ) {
-//                searchProgress.isVisible = false
-//                if (response.isSuccessful) {
-//                    tracks.clear()
-//                    response.body()?.results?.let { results ->
-//                        if (results.isNotEmpty()) {
-//                            tracks.addAll(results)
-//                            trackAdapter.notifyDataSetChanged()
-//                            showError("", "")
-//                        } else {
-//                            showError(getString(R.string.nothing_found), "")
-//                        }
-//                    } ?: run {
-//                        showError(
-//                            getString(R.string.communication_problems),
-//                            response.code().toString()
-//                        )
-//                    }
-//                } else {
-//                    showError(
-//                        getString(R.string.communication_problems),
-//                        response.code().toString()
-//                    )
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
-//                searchProgress.isVisible = false
-//                showError(getString(R.string.communication_problems), t.message.toString())
-//            }
-//        })
+        tracksInteractor.searchTrack(query, object :
+            TracksInteractor.TracksConsumer {
+            override fun consume(foundTracks: List<Track>) {
+                runOnUiThread {
+                    searchProgress.isVisible = false
+                    tracks.clear()
+                    tracks.addAll(foundTracks)
+                    trackAdapter.notifyDataSetChanged()
+                    if (foundTracks.isEmpty()) {
+                        showError(getString(R.string.nothing_found), "")
+                    } else {
+                        clearErrorState()
+                    }
+                }
+            }
+        },
+            object : TracksInteractor.ErrorConsumer {
+                override fun consume(errorMessage: String) {
+                    runOnUiThread {
+                        searchProgress.isVisible = false
+                        showError(getString(R.string.communication_problems), errorMessage)
+                    }
+                }
+            }
+        )
     }
 
     private fun showTrackSearchHistory() {
@@ -294,6 +271,8 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
             showTrackSearchHistory()
         }
 
+        tracksInteractor.saveTrack(track)
+
         val trackIntent = Intent(this, TrackActivity::class.java).apply {
             putExtra("TRACK", track)
         }
@@ -312,5 +291,11 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clearErrorState() {
+        errorImage.isVisible = false
+        errorMessage.isVisible = false
+        refreshButton.isVisible = false
     }
 }

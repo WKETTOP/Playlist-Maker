@@ -1,6 +1,5 @@
 package com.example.playlistmaker.ui.track
 
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -16,6 +15,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.MediaPlayerManagerImpl
+import com.example.playlistmaker.domain.api.MediaPlayerManager
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.impl.Transform
 
@@ -31,12 +32,13 @@ class TrackActivity : AppCompatActivity() {
 
     }
 
-    private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
 
     private var handler = Handler(Looper.getMainLooper())
     private var trackCurrentPosition: Int = 0
     private var trackFullTime: String = "0"
+
+    private lateinit var mediaPlayerManager: MediaPlayerManager
 
     private lateinit var trackTimeRunnable: Runnable
     private lateinit var url: String
@@ -64,6 +66,8 @@ class TrackActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        mediaPlayerManager = MediaPlayerManagerImpl()
 
         backButton = findViewById(R.id.back_button)
         artWork = findViewById(R.id.art_work)
@@ -119,8 +123,8 @@ class TrackActivity : AppCompatActivity() {
 
         trackTimeRunnable = object : Runnable {
             override fun run() {
-                if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
-                    trackCurrentPosition = mediaPlayer.currentPosition
+                if (playerState == STATE_PLAYING) {
+                    trackCurrentPosition = mediaPlayerManager.getCurrentPosition()
                     trackTime.text = Transform.millisToMin(trackCurrentPosition.toString())
                     handler.postDelayed(this, TRACK_PLAYING_DELAY)
                 }
@@ -137,18 +141,16 @@ class TrackActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(trackTimeRunnable)
-        mediaPlayer.release()
+        mediaPlayerManager.release()
     }
 
 
     private fun preparePlayer() {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
+        mediaPlayerManager.prepare(url) {
             playButton.isEnabled = true
             playerState = STATE_PREPARED
         }
-        mediaPlayer.setOnCompletionListener {
+        mediaPlayerManager.setOnCompletionListener {
             playButton.setImageResource(R.drawable.play_button_100)
             playerState = STATE_PREPARED
             handler.removeCallbacks(trackTimeRunnable)
@@ -157,14 +159,14 @@ class TrackActivity : AppCompatActivity() {
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        mediaPlayerManager.start()
         playButton.setImageResource(R.drawable.stop_button_100)
         playerState = STATE_PLAYING
         handler.post(trackTimeRunnable)
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        mediaPlayerManager.pause()
         playButton.setImageResource(R.drawable.play_button_100)
         playerState = STATE_PAUSED
         handler.removeCallbacks(trackTimeRunnable)

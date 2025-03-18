@@ -27,7 +27,6 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.ui.track.TrackActivity
 import com.example.playlistmaker.presentation.TrackClickListener
-import com.example.playlistmaker.data.dto.SharedPreferencesTrackSearchHistory
 import com.example.playlistmaker.domain.api.TracksInteractor
 
 class SearchActivity : AppCompatActivity(), TrackClickListener {
@@ -42,6 +41,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private var isTrackClickAllowed = true
 
     private var handler = Handler(Looper.getMainLooper())
+
     private val searchRunnable = Runnable {
         val query = inputTextEdit.text.toString().trim()
         if (query.isNotEmpty()) {
@@ -49,6 +49,10 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         } else {
             showTrackSearchHistory()
         }
+    }
+
+    private val tracksInteractor by lazy {
+        Creator.provideTracksInteractor(this)
     }
 
     private var textInputValue: String = TEXT_DEF
@@ -61,13 +65,10 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     private lateinit var errorImage: ImageView
     private lateinit var refreshButton: Button
     private lateinit var searchResult: RecyclerView
-    private lateinit var sharedPreferencesTrackSearchHistory: SharedPreferencesTrackSearchHistory
     private lateinit var findMessage: TextView
     private lateinit var clearTrackSearchHistory: Button
     private lateinit var trackAdapter: TrackAdapter
-//    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var searchProgress: ProgressBar
-    private lateinit var tracksInteractor: TracksInteractor
 
     private val tracks = ArrayList<Track>()
 
@@ -91,10 +92,6 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
         findMessage = findViewById(R.id.find_text)
         clearTrackSearchHistory = findViewById(R.id.clear_track_history_button)
         searchProgress = findViewById(R.id.search_progress)
-
-        tracksInteractor = Creator.provideTracksInteractor(this)
-
-        sharedPreferencesTrackSearchHistory = SharedPreferencesTrackSearchHistory(this)
 
         trackAdapter = TrackAdapter { track ->
             if (trackClickDebounce()) {

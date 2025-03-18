@@ -11,11 +11,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.ui.App
 import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.ThemeManager
+import com.example.playlistmaker.domain.impl.ThemeManagerImpl
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var themeManager: ThemeManager
     private lateinit var settingsToolbar: Toolbar
     private lateinit var themeSwitch: SwitchMaterial
     private lateinit var shareButton: MaterialTextView
@@ -31,6 +34,8 @@ class SettingsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        themeManager = ThemeManagerImpl(applicationContext as App)
 
         settingsToolbar = findViewById(R.id.settings_toolbar)
         themeSwitch = findViewById(R.id.dark_theme_switch)
@@ -76,8 +81,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val app = applicationContext as App
-        val currentMode = app.getCurrentTheme()
+        val currentMode = themeManager.getCurrentTheme()
 
         themeSwitch.isChecked = when (currentMode) {
             "dark" -> true
@@ -87,7 +91,7 @@ class SettingsActivity : AppCompatActivity() {
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
             val newMode = if (isChecked) "dark" else "light"
-            app.switchTheme(newMode)
+            themeManager.switchTheme(newMode)
         }
     }
 

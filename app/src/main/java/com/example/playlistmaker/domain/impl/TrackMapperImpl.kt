@@ -1,12 +1,8 @@
 package com.example.playlistmaker.domain.impl
 
-import android.icu.text.SimpleDateFormat
 import com.example.playlistmaker.data.dto.TrackDto
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.models.TrackMapper
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class TrackMapperImpl : TrackMapper {
 

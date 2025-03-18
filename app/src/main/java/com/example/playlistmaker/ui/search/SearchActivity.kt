@@ -52,7 +52,7 @@ class SearchActivity : AppCompatActivity(), TrackClickListener {
     }
 
     private val tracksInteractor by lazy {
-        Creator.provideTracksInteractor(this)
+        Creator.provideTracksInteractor()
     }
 
     private var textInputValue: String = TEXT_DEF

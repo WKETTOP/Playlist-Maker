@@ -17,6 +17,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.data.MediaPlayerManagerImpl
 import com.example.playlistmaker.domain.api.MediaPlayerManager
+import com.example.playlistmaker.domain.api.TrackPlayerInteractor
+import com.example.playlistmaker.domain.impl.TrackPlayerInteractorImpl
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.impl.Transform
 
@@ -38,7 +40,7 @@ class TrackActivity : AppCompatActivity() {
     private var trackCurrentPosition: Int = 0
     private var trackFullTime: String = "0"
 
-    private lateinit var mediaPlayerManager: MediaPlayerManager
+    private lateinit var trackPlayerInteractor: TrackPlayerInteractor
 
     private lateinit var trackTimeRunnable: Runnable
     private lateinit var url: String
@@ -67,7 +69,7 @@ class TrackActivity : AppCompatActivity() {
             insets
         }
 
-        mediaPlayerManager = MediaPlayerManagerImpl()
+        trackPlayerInteractor = TrackPlayerInteractorImpl(MediaPlayerManagerImpl())
 
         backButton = findViewById(R.id.back_button)
         artWork = findViewById(R.id.art_work)
@@ -124,7 +126,7 @@ class TrackActivity : AppCompatActivity() {
         trackTimeRunnable = object : Runnable {
             override fun run() {
                 if (playerState == STATE_PLAYING) {
-                    trackCurrentPosition = mediaPlayerManager.getCurrentPosition()
+                    trackCurrentPosition = trackPlayerInteractor.getCurrentPosition()
                     trackTime.text = Transform.millisToMin(trackCurrentPosition.toString())
                     handler.postDelayed(this, TRACK_PLAYING_DELAY)
                 }
@@ -141,16 +143,16 @@ class TrackActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(trackTimeRunnable)
-        mediaPlayerManager.release()
+        trackPlayerInteractor.releasePlayback()
     }
 
 
     private fun preparePlayer() {
-        mediaPlayerManager.prepare(url) {
+        trackPlayerInteractor.prepareTrack(url) {
             playButton.isEnabled = true
             playerState = STATE_PREPARED
         }
-        mediaPlayerManager.setOnCompletionListener {
+        trackPlayerInteractor.setOnCompletionListener {
             playButton.setImageResource(R.drawable.play_button_100)
             playerState = STATE_PREPARED
             handler.removeCallbacks(trackTimeRunnable)
@@ -159,14 +161,14 @@ class TrackActivity : AppCompatActivity() {
     }
 
     private fun startPlayer() {
-        mediaPlayerManager.start()
+        trackPlayerInteractor.startPlayback()
         playButton.setImageResource(R.drawable.stop_button_100)
         playerState = STATE_PLAYING
         handler.post(trackTimeRunnable)
     }
 
     private fun pausePlayer() {
-        mediaPlayerManager.pause()
+        trackPlayerInteractor.pausePlayback()
         playButton.setImageResource(R.drawable.play_button_100)
         playerState = STATE_PAUSED
         handler.removeCallbacks(trackTimeRunnable)

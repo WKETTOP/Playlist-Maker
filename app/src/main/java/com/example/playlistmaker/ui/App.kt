@@ -2,6 +2,7 @@ package com.example.playlistmaker.ui
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.Creator
 
 class App : Application() {
 
@@ -13,6 +14,9 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Creator.initApplication(this)
+
         val sharedPreferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         val savedThemeMode = sharedPreferences.getString(THEME_MODE_KEY, null)
 

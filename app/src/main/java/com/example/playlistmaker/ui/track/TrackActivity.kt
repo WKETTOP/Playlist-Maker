@@ -14,11 +14,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.MediaPlayerManagerImpl
-import com.example.playlistmaker.domain.api.MediaPlayerManager
 import com.example.playlistmaker.domain.api.TrackPlayerInteractor
-import com.example.playlistmaker.domain.impl.TrackPlayerInteractorImpl
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.impl.Transform
 
@@ -69,7 +67,7 @@ class TrackActivity : AppCompatActivity() {
             insets
         }
 
-        trackPlayerInteractor = TrackPlayerInteractorImpl(MediaPlayerManagerImpl())
+        trackPlayerInteractor = Creator.provideTrackPlayer()
 
         backButton = findViewById(R.id.back_button)
         artWork = findViewById(R.id.art_work)

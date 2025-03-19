@@ -1,14 +1,17 @@
 package com.example.playlistmaker.domain.impl
 
+import com.example.playlistmaker.domain.api.AppSettingsRepository
 import com.example.playlistmaker.domain.api.ThemeManager
-import com.example.playlistmaker.ui.App
 
-class ThemeManagerImpl(private val app: App) : ThemeManager {
-    override fun getCurrentTheme(): String {
-       return app.getCurrentTheme()
+class ThemeManagerImpl(private val appSettingsRepository: AppSettingsRepository) : ThemeManager {
+    override fun isDarkThemeEnabled(): Boolean {
+        return appSettingsRepository.getThemeMode() == "dark"
     }
 
-    override fun switchTheme(themeMode: String) {
-        app.switchTheme(themeMode)
+    override fun switchTheme(isDarkTheme: Boolean) {
+        val newMode = if (isDarkTheme) "dark" else "light"
+        appSettingsRepository.saveThemeMode(newMode)
+        appSettingsRepository.applyTheme()
     }
+
 }

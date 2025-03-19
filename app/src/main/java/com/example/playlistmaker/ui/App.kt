@@ -17,8 +17,8 @@ class App : Application() {
 
         Creator.initApplication(this)
 
-        val settingsRepository = Creator.provideAppSettingsRepository()
-        val savedThemeMode = settingsRepository.getThemeMode()
+        val settingsRepository = Creator.provideThemeManager()
+        val savedThemeMode = settingsRepository.getCurrentThemeMode()
 
         if (savedThemeMode == FOLLOW_SYSTEM_MODE_KEY) {
             switchTheme(FOLLOW_SYSTEM_MODE_KEY)

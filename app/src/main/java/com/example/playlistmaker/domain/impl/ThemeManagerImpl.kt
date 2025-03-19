@@ -14,4 +14,8 @@ class ThemeManagerImpl(private val appSettingsRepository: AppSettingsRepository)
         appSettingsRepository.applyTheme()
     }
 
+    override fun getCurrentThemeMode(): String {
+        return appSettingsRepository.getThemeMode()
+    }
+
 }

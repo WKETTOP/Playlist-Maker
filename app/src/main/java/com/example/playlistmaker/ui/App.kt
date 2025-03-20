@@ -1,7 +1,8 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.Creator
 
 class App : Application() {
 
@@ -13,11 +14,13 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val sharedPreferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        val savedThemeMode = sharedPreferences.getString(THEME_MODE_KEY, null)
 
-        if (savedThemeMode == null) {
-            sharedPreferences.edit().putString(THEME_MODE_KEY, FOLLOW_SYSTEM_MODE_KEY).apply()
+        Creator.initApplication(this)
+
+        val settingsRepository = Creator.provideThemeManager()
+        val savedThemeMode = settingsRepository.getCurrentThemeMode()
+
+        if (savedThemeMode == FOLLOW_SYSTEM_MODE_KEY) {
             switchTheme(FOLLOW_SYSTEM_MODE_KEY)
         } else {
             switchTheme(savedThemeMode)
@@ -25,9 +28,6 @@ class App : Application() {
     }
 
     fun switchTheme(themeMode: String) {
-        val sharedPreferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        sharedPreferences.edit().putString(THEME_MODE_KEY, themeMode).apply()
-
         val mode = when (themeMode) {
             "dark" -> AppCompatDelegate.MODE_NIGHT_YES
             "light" -> AppCompatDelegate.MODE_NIGHT_NO
@@ -37,8 +37,4 @@ class App : Application() {
         AppCompatDelegate.setDefaultNightMode(mode)
     }
 
-    fun getCurrentTheme(): String {
-        val sharedPreferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        return sharedPreferences.getString(THEME_MODE_KEY, "follow_system")!!
-    }
 }

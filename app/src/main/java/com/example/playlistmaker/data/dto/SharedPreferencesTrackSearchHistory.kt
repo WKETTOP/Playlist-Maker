@@ -1,24 +1,27 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.dto
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.domain.api.TrackSearchHistory
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class TrackSearchHistory(private val sharedPreferences: SharedPreferences) {
+class SharedPreferencesTrackSearchHistory(private val prefs: SharedPreferences) : TrackSearchHistory {
 
     companion object {
         const val HISTORY_KEY = "track_search_history"
         private const val TRACK_SEARCH_MAX_SIZE = 10
     }
 
-    fun getTrackSearchHistory(): ArrayList<Track> {
-        val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return ArrayList()
+
+    override fun getTrackSearchHistory(): ArrayList<Track> {
+        val json = prefs.getString(HISTORY_KEY, null) ?: return ArrayList()
         val type = object : TypeToken<ArrayList<Track>>() {}.type
         return Gson().fromJson(json, type) ?: ArrayList()
     }
 
 
-    fun saveTrack(track: Track) {
+    override fun saveTrack(track: Track) {
         val historyTrack = getTrackSearchHistory()
 
         historyTrack.removeAll { it.trackId == track.trackId }
@@ -28,18 +31,18 @@ class TrackSearchHistory(private val sharedPreferences: SharedPreferences) {
             historyTrack.removeAt(historyTrack.size - 1)
         }
 
-        saveTrackSearchHistory(historyTrack)
+        saveTrackSearchHistory(historyTrack, prefs)
     }
 
-    private fun saveTrackSearchHistory(trackHistory: ArrayList<Track>) {
+    private fun saveTrackSearchHistory(trackHistory: ArrayList<Track>, prefs: SharedPreferences) {
         val json = Gson().toJson(trackHistory)
-        sharedPreferences.edit()
+        prefs.edit()
             .putString(HISTORY_KEY, json)
             .apply()
     }
 
-    fun clearTrackSearchHistory() {
-        sharedPreferences.edit()
+    override fun clearTrackSearchHistory() {
+        prefs.edit()
             .remove(HISTORY_KEY)
             .apply()
     }

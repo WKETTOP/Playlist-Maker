@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.track
 
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +14,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.TrackPlayerInteractor
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.impl.Transform
 
 class TrackActivity : AppCompatActivity() {
 
@@ -28,12 +32,13 @@ class TrackActivity : AppCompatActivity() {
 
     }
 
-    private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
 
     private var handler = Handler(Looper.getMainLooper())
     private var trackCurrentPosition: Int = 0
     private var trackFullTime: String = "0"
+
+    private lateinit var trackPlayerInteractor: TrackPlayerInteractor
 
     private lateinit var trackTimeRunnable: Runnable
     private lateinit var url: String
@@ -62,6 +67,8 @@ class TrackActivity : AppCompatActivity() {
             insets
         }
 
+        trackPlayerInteractor = Creator.provideTrackPlayer()
+
         backButton = findViewById(R.id.back_button)
         artWork = findViewById(R.id.art_work)
         trackName = findViewById(R.id.track_name)
@@ -88,10 +95,7 @@ class TrackActivity : AppCompatActivity() {
         }
 
         if (track != null) {
-            trackFullTime = track.trackTimeMillis
-            val formatTimeTrack = Transform.millisToMin(trackFullTime)
             val cornerRadiusTrack = Transform.dpToPx(8f, this)
-            val yearTrack = Transform.dateToYear(track.releaseDate)
 
             url = track.previewUrl
 
@@ -103,10 +107,10 @@ class TrackActivity : AppCompatActivity() {
                 .into(artWork)
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = formatTimeTrack
-            durationValue.text = formatTimeTrack
+            trackTime.text = track.formattedTrackTime
+            durationValue.text = track.formattedTrackTime
             albumValue.text = track.collectionName
-            yearValue.text = yearTrack
+            yearValue.text = track.formattedReleaseDate
             genreValue.text = track.primaryGenreName
             countryValue.text = track.country
         }
@@ -119,13 +123,14 @@ class TrackActivity : AppCompatActivity() {
 
         trackTimeRunnable = object : Runnable {
             override fun run() {
-                if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
-                    trackCurrentPosition = mediaPlayer.currentPosition
+                if (playerState == STATE_PLAYING) {
+                    trackCurrentPosition = trackPlayerInteractor.getCurrentPosition()
                     trackTime.text = Transform.millisToMin(trackCurrentPosition.toString())
                     handler.postDelayed(this, TRACK_PLAYING_DELAY)
                 }
             }
         }
+
     }
 
     override fun onPause() {
@@ -136,33 +141,32 @@ class TrackActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(trackTimeRunnable)
-        mediaPlayer.release()
+        trackPlayerInteractor.releasePlayback()
     }
 
+
     private fun preparePlayer() {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
+        trackPlayerInteractor.prepareTrack(url) {
             playButton.isEnabled = true
             playerState = STATE_PREPARED
         }
-        mediaPlayer.setOnCompletionListener {
+        trackPlayerInteractor.setOnCompletionListener {
             playButton.setImageResource(R.drawable.play_button_100)
             playerState = STATE_PREPARED
             handler.removeCallbacks(trackTimeRunnable)
-            trackTime.text = Transform.millisToMin(trackFullTime)
+            trackTime.text = trackFullTime
         }
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        trackPlayerInteractor.startPlayback()
         playButton.setImageResource(R.drawable.stop_button_100)
         playerState = STATE_PLAYING
         handler.post(trackTimeRunnable)
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        trackPlayerInteractor.pausePlayback()
         playButton.setImageResource(R.drawable.play_button_100)
         playerState = STATE_PAUSED
         handler.removeCallbacks(trackTimeRunnable)

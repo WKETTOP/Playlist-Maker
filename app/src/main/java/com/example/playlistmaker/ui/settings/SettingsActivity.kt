@@ -1,7 +1,6 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.settings
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
@@ -9,11 +8,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.ThemeManager
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var themeManager: ThemeManager
     private lateinit var settingsToolbar: Toolbar
     private lateinit var themeSwitch: SwitchMaterial
     private lateinit var shareButton: MaterialTextView
@@ -29,6 +32,8 @@ class SettingsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        themeManager = Creator.provideThemeManager()
 
         settingsToolbar = findViewById(R.id.settings_toolbar)
         themeSwitch = findViewById(R.id.dark_theme_switch)
@@ -74,22 +79,12 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val app = applicationContext as App
-        val currentMode = app.getCurrentTheme()
+        val currentMode = themeManager.isDarkThemeEnabled()
 
-        themeSwitch.isChecked = when (currentMode) {
-            "dark" -> true
-            "light" -> false
-            else -> isSystemInDarkMode()
-        }
+        themeSwitch.isChecked = currentMode
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val newMode = if (isChecked) "dark" else "light"
-            app.switchTheme(newMode)
+            themeManager.switchTheme(isChecked)
         }
-    }
-
-    private fun isSystemInDarkMode(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 }

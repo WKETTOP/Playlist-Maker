@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,6 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.impl.Transform
+import com.example.playlistmaker.domain.models.Track
 
 class TrackViewHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(
@@ -19,9 +22,7 @@ class TrackViewHolder(parent: ViewGroup) :
     private val timeTrack: TextView = itemView.findViewById(R.id.track_time)
 
     fun bind(track: Track) {
-
         val cornerRadius = Transform.dpToPx(2f, itemView.context)
-        val formatTime = Transform.millisToMin(track.trackTimeMillis)
 
         Glide.with(itemView)
             .load(track.artworkUrl100)
@@ -31,7 +32,7 @@ class TrackViewHolder(parent: ViewGroup) :
             .into(artWork)
         nameTrack.text = track.trackName
         nameArtist.text = track.artistName
-        timeTrack.text = formatTime
+        timeTrack.text = track.formattedTrackTime
         nameArtist.requestLayout()
     }
 

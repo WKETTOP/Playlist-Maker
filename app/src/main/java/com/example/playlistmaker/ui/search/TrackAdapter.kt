@@ -1,12 +1,12 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.presentation.TrackClickListener
+import com.example.playlistmaker.data.dto.SharedPreferencesTrackSearchHistory
+import com.example.playlistmaker.domain.models.Track
 
-class TrackAdapter(
-    private val searchHistory: TrackSearchHistory,
-    private val clickListener: (Track) -> Unit
-) : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(private val clickListener: (Track) -> Unit) : RecyclerView.Adapter<TrackViewHolder>() {
 
     var tracks = ArrayList<Track>()
     private val observers = mutableListOf<TrackClickListener>()
@@ -26,7 +26,6 @@ class TrackAdapter(
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
-            searchHistory.saveTrack(tracks[position])
             clickListener(tracks[position])
         }
     }

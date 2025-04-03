@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.domain.impl
+package com.example.playlistmaker.util
 
 import android.content.Context
 import android.icu.text.SimpleDateFormat

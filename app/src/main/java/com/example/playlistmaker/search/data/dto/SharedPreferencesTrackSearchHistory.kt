@@ -15,15 +15,15 @@ class SharedPreferencesTrackSearchHistory(private val prefs: SharedPreferences) 
     }
 
 
-    override fun getTrackSearchHistory(): ArrayList<Track> {
-        val json = prefs.getString(HISTORY_KEY, null) ?: return ArrayList()
-        val type = object : TypeToken<ArrayList<Track>>() {}.type
-        return Gson().fromJson(json, type) ?: ArrayList()
+    override fun getTrackSearchHistory(): List<Track> {
+        val json = prefs.getString(HISTORY_KEY, null) ?: return emptyList()
+        val type = object : TypeToken<List<Track>>() {}.type
+        return Gson().fromJson(json, type) ?: emptyList()
     }
 
 
     override fun saveTrack(track: Track) {
-        val historyTrack = getTrackSearchHistory()
+        val historyTrack = getTrackSearchHistory().toMutableList()
 
         historyTrack.removeAll { it.trackId == track.trackId }
         historyTrack.add(0, track)
@@ -35,7 +35,7 @@ class SharedPreferencesTrackSearchHistory(private val prefs: SharedPreferences) 
         saveTrackSearchHistory(historyTrack, prefs)
     }
 
-    private fun saveTrackSearchHistory(trackHistory: ArrayList<Track>, prefs: SharedPreferences) {
+    private fun saveTrackSearchHistory(trackHistory: List<Track>, prefs: SharedPreferences) {
         val json = Gson().toJson(trackHistory)
         prefs.edit()
             .putString(HISTORY_KEY, json)

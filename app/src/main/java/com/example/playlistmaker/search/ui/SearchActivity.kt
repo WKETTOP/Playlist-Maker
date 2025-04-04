@@ -44,23 +44,37 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter = TrackAdapter(viewModel::onTrackClicked)
 
-
         binding.searchResult.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.searchResult.adapter = trackAdapter
+
+        val savedText = savedInstanceState?.getString(KEY_INPUT_TEXT)
+        if (savedText != null) {
+            viewModel.setSearchQuery(savedText)
+        }
+
+        viewModel.observeSearchQuery().observe(this) { query ->
+            if (query != binding.trackInput.text.toString()) {
+                binding.trackInput.setText(query)
+            }
+        }
 
         binding.searchToolbar.setNavigationOnClickListener {
             finish()
         }
 
         binding.trackInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.searchDebounce(s?.toString() ?: "")
                 binding.clearText.isVisible = !s.isNullOrEmpty()
             }
 
-            override fun afterTextChanged(s: Editable?) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.setSearchQuery(s.toString())
+            }
         })
 
         binding.clearText.setOnClickListener {
@@ -71,13 +85,16 @@ class SearchActivity : AppCompatActivity() {
             binding.errorText.isVisible = false
             binding.errorImage.isVisible = false
             binding.refreshButton.isVisible = false
+            viewModel.loadHistory()
+            showHistory(viewModel.observeHistory().value ?: emptyList())
         }
 
-//        binding.trackInput.setOnFocusChangeListener { _, hasFocus ->
-//            if (hasFocus && binding.trackInput.text.isEmpty()) {
-//                showHistory()
-//            }
-//        }
+        binding.trackInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && binding.trackInput.text.isEmpty()) {
+                viewModel.loadHistory()
+                showHistory(viewModel.observeHistory().value ?: emptyList())
+            }
+        }
 
         binding.trackInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -96,14 +113,15 @@ class SearchActivity : AppCompatActivity() {
 
         binding.clearTrackHistoryButton.setOnClickListener {
             viewModel.clearHistory()
+            binding.searchResult.isVisible = false
         }
 
         viewModel.observeState().observe(this) { state ->
             when (state) {
                 is SearchState.Loading -> showLoading()
                 is SearchState.Content -> showContent(state.tracks)
-                is SearchState.Error -> showError(state.errorMessage)
-                is SearchState.Empty -> showEmpty(state.message)
+                is SearchState.Error -> showError()
+                is SearchState.Empty -> showEmpty()
             }
         }
 
@@ -120,35 +138,36 @@ class SearchActivity : AppCompatActivity() {
         viewModel.observerShowToast().observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
+    }
 
-        savedInstanceState?.getString(KEY_INPUT_TEXT)?.let {
-            binding.trackInput.setText(it)
+    override fun onResume() {
+        super.onResume()
+        if (binding.trackInput.text.isEmpty() && binding.trackInput.hasFocus()) {
+            viewModel.loadHistory()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(KEY_INPUT_TEXT, binding.trackInput.text.toString())
+        outState.putString(KEY_INPUT_TEXT, viewModel.observeSearchQuery().value ?: "")
     }
 
-//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        super.onRestoreInstanceState(savedInstanceState)
-//        textInputValue = savedInstanceState.getString(KEY_INPUT_TEXT, TEXT_DEF)
-//    }
-
-    private fun showError(additionalMessage: String) {
+    private fun showError() {
         binding.searchProgress.isVisible = false
-        binding.errorText.text = additionalMessage
+        binding.errorText.isVisible = true
+        binding.errorImage.isVisible = true
+        binding.errorText.setText(R.string.communication_problems)
         binding.errorImage.setImageResource(R.drawable.download_failed_120)
         binding.refreshButton.isVisible = true
     }
 
     private fun showHistory(history: List<Track>) {
         if (history.isNotEmpty()) {
-            trackAdapter.updateData(ArrayList(history))
+            trackAdapter.updateData(history)
             binding.findText.setText(R.string.find_line)
             binding.findText.isVisible = true
             binding.clearTrackHistoryButton.isVisible = true
+            binding.searchResult.isVisible = true
         } else {
             binding.findText.isVisible = false
             binding.clearTrackHistoryButton.isVisible = false
@@ -164,19 +183,26 @@ class SearchActivity : AppCompatActivity() {
     private fun showLoading() {
         binding.searchProgress.isVisible = true
         clearErrorState()
+        binding.refreshButton.isVisible = false
+        binding.findText.isVisible = false
+        binding.clearTrackHistoryButton.isVisible = false
         binding.searchResult.isVisible = false
     }
 
     private fun showContent(track: List<Track>) {
         binding.searchProgress.isVisible = false
         clearErrorState()
+        binding.refreshButton.isVisible = false
+        binding.findText.isVisible = false
         binding.searchResult.isVisible = true
         trackAdapter.updateData(track)
     }
 
-    private fun showEmpty(message: String) {
+    private fun showEmpty() {
         binding.searchProgress.isVisible = false
-        binding.errorText.text = message
+        binding.errorText.isVisible = true
+        binding.errorImage.isVisible = true
+        binding.errorText.setText(R.string.nothing_found)
         binding.errorImage.setImageResource(R.drawable.nothing_found_120)
         binding.refreshButton.isVisible = true
     }

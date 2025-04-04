@@ -19,9 +19,17 @@ class TracksInteractorImpl(
         consumer: TracksInteractor.TracksConsumer,
     ) {
         executor.execute {
-            when (val resource = repository.searchTrack(expression)) {
-                is Resource.Success -> { consumer.consume(resource.data, null) }
-                is Resource.Error -> { consumer.consume(null, resource.message) }
+            try {
+                when (val resource = repository.searchTrack(expression)) {
+                    is Resource.Success -> { consumer.consume(resource.data, null) }
+                    is Resource.Error -> {
+                        val message = resource.message.takeIf { !it.isNullOrEmpty() } ?: "Unknown error"
+                        consumer.consume(null, message)
+                    }
+                }
+            } catch (e: Throwable) {
+                val errorMessage = e.message ?: "Failed to execute search"
+                consumer.consume(null, errorMessage)
             }
         }
     }

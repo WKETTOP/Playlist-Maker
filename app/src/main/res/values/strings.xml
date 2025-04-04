@@ -16,6 +16,7 @@
     <string name="clear_line">Clear</string>
     <string name="nothing_found">Nothing was found</string>
     <string name="communication_problems">Communication problems\n\nThe download failed. Check your internet connection</string>
+    <string name="app_not_found">No suitable application was found</string>
     <string name="refresh_line">Refresh</string>
     <string name="find_line">You were looking for</string>
     <string name="clear_track_history_line">Clear the history</string>

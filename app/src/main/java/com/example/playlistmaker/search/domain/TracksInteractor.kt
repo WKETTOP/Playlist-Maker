@@ -11,8 +11,4 @@ interface TracksInteractor {
     interface TracksConsumer {
         fun consume(foundTracks: List<Track>?, errorMessage: String?)
     }
-
-//    interface ErrorConsumer {
-//        fun consume(errorMessage: String)
-//    }
 }

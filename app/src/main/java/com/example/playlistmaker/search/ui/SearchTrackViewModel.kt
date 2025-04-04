@@ -40,6 +40,9 @@ class SearchTrackViewModel(
     private val stateLiveData = MutableLiveData<SearchState>()
     fun observeState(): LiveData<SearchState> = stateLiveData
 
+    private val searchQuery = MutableLiveData<String>()
+    fun observeSearchQuery(): LiveData<String> = searchQuery
+
     private val history = MutableLiveData<List<Track>>()
     fun observeHistory(): LiveData<List<Track>> = history
 
@@ -58,6 +61,10 @@ class SearchTrackViewModel(
 
     override fun onCleared() {
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+    }
+
+    fun setSearchQuery(query: String) {
+        searchQuery.postValue(query)
     }
 
     fun searchDebounce(changedText: String) {
@@ -81,7 +88,7 @@ class SearchTrackViewModel(
     private fun performSearch(query: String) {
         if (query.isNotEmpty()) {
 
-            stateLiveData.value = SearchState.Loading
+            stateLiveData.postValue(SearchState.Loading)
 
             tracksInteractor.searchTrack(
                 query,
@@ -89,7 +96,7 @@ class SearchTrackViewModel(
                     override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
                        when {
                            errorMessage != null -> handlerError(errorMessage)
-                           foundTracks.isNullOrEmpty() -> handleEmptyResults()
+                           foundTracks.isNullOrEmpty() -> handleEmptyResults(errorMessage)
                            else -> handleSuccess(foundTracks)
                        }
                     }
@@ -111,7 +118,7 @@ class SearchTrackViewModel(
     fun onTrackClicked(track: Track) {
         if (trackClickDebounce()) {
             tracksInteractor.saveTrack(track)
-            navigateToTrack.value = track
+            navigateToTrack.postValue(track)
         }
     }
 
@@ -120,24 +127,21 @@ class SearchTrackViewModel(
         loadHistory()
     }
 
-    private fun loadHistory() {
-        history.value = tracksInteractor.getTrackSearchHistory()
+    fun loadHistory() {
+        history.postValue(tracksInteractor.getTrackSearchHistory())
     }
 
     private fun handlerError(message: String) {
-        stateLiveData.value = SearchState.Error(
-            getApplication<Application>().getString(R.string.communication_problems)
-        )
-        showToast.value = message
+        stateLiveData.postValue(SearchState.Error(getApplication<Application>().getString(R.string.communication_problems)))
+        showToast.postValue(message)
     }
 
-    private fun handleEmptyResults() {
-        stateLiveData.value = SearchState.Empty(
-            getApplication<Application>().getString(R.string.nothing_found)
-        )
+    private fun handleEmptyResults(message: String?) {
+        stateLiveData.postValue(SearchState.Empty(getApplication<Application>().getString(R.string.nothing_found)))
+        showToast.postValue(message ?: "")
     }
 
     private fun handleSuccess(track: List<Track>) {
-        stateLiveData.value = SearchState.Content(track.toMutableList())
+        stateLiveData.postValue(SearchState.Content(track.toMutableList()))
     }
 }

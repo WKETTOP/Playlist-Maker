@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
+import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Creator
 import kotlinx.coroutines.Job
@@ -43,20 +44,21 @@ class TrackViewModel(
     val track: Track
         get() = _track
 
-    private val _playerState = MutableLiveData<PlayerState>()
-    val playerState: LiveData<PlayerState> = _playerState
-
-    private val _currentPosition = MutableLiveData<Int>()
-    val currentPosition: LiveData<Int> = _currentPosition
+    private val _playerViewState = MutableLiveData<PlayerViewState>()
+    val playerViewState: LiveData<PlayerViewState> = _playerViewState
 
     private var updateJob: Job? = null
 
     init {
+        _playerViewState.value = PlayerViewState(
+            playerState = PlayerState.LOADING,
+            currentPosition = _track.formattedTrackTime
+        )
         preparePlayer()
     }
 
     fun togglePlayback() {
-        when (playerState.value) {
+        when (_playerViewState.value?.playerState) {
             PlayerState.PLAYING -> pausePlayer()
             PlayerState.PAUSED, PlayerState.PREPARED -> startPlayer()
             else -> {}
@@ -64,25 +66,25 @@ class TrackViewModel(
     }
 
     private fun preparePlayer() {
-        _playerState.value = PlayerState.LOADING
+        updateViewState(playerState = PlayerState.LOADING)
         trackPlayerInteractor.prepareTrack(track.previewUrl) {
-            _playerState.postValue(PlayerState.PREPARED)
+            updateViewState(playerState = PlayerState.PREPARED, currentPosition = track.formattedTrackTime)
         }
         trackPlayerInteractor.setOnCompletionListener {
-            _playerState.postValue(PlayerState.PREPARED)
+            updateViewState(playerState = PlayerState.PREPARED, currentPosition = "00:00")
             updateJob?.cancel()
         }
     }
 
     private fun startPlayer() {
         trackPlayerInteractor.startPlayback()
-        _playerState.value = PlayerState.PLAYING
+        updateViewState(playerState = PlayerState.PLAYING)
         startPositionUpdate()
     }
 
     private fun pausePlayer() {
         trackPlayerInteractor.pausePlayback()
-        _playerState.value = PlayerState.PAUSED
+        updateViewState(playerState = PlayerState.PAUSED)
         stopPositionUpdate()
     }
 
@@ -90,7 +92,8 @@ class TrackViewModel(
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
             while (isActive) {
-                _currentPosition.postValue(trackPlayerInteractor.getCurrentPosition())
+                val position = trackPlayerInteractor.getCurrentPosition()
+                updateViewState(currentPosition = position.toString())
                 delay(TRACK_PLAYING_DELAY)
             }
         }
@@ -98,6 +101,17 @@ class TrackViewModel(
 
     private fun stopPositionUpdate() {
         updateJob?.cancel()
+    }
+
+    private fun updateViewState(
+        playerState: PlayerState? = null,
+        currentPosition: String? = null
+    ) {
+        val current = _playerViewState.value ?: PlayerViewState()
+        _playerViewState.value = current.copy(
+            playerState = playerState ?: current.playerState,
+            currentPosition = currentPosition ?: current.currentPosition
+        )
     }
 
     override fun onCleared() {

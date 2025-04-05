@@ -60,25 +60,53 @@ class TrackActivity : AppCompatActivity() {
         binding.genreValue.text = viewModel.track.primaryGenreName
         binding.countryValue.text = viewModel.track.country
 
-        viewModel.playerState.observe(this) { state ->
-            when (state) {
-                TrackViewModel.PlayerState.LOADING -> showLoadingState()
-                TrackViewModel.PlayerState.PREPARED -> showPrepareState()
-                TrackViewModel.PlayerState.PLAYING -> showPlayingState()
-                TrackViewModel.PlayerState.PAUSED -> showPausedState()
-            }
-        }
+        viewModel.playerViewState.observe(this) { state ->
+            updatePlayerState(state.playerState)
 
-        viewModel.currentPosition.observe(this) { position ->
-            binding.trackTime.text = Transform.millisToMin(position.toString())
+            when (state.playerState) {
+                TrackViewModel.PlayerState.PLAYING, TrackViewModel.PlayerState.PAUSED -> {
+                    updateTrackPosition(state.currentPosition)
+                }
+                TrackViewModel.PlayerState.PREPARED -> {
+                    if (state.currentPosition == "00:00") {
+                        updateTrackPosition(state.currentPosition)
+                    }
+                }
+                TrackViewModel.PlayerState.LOADING -> {}
+            }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.playerState.value == TrackViewModel.PlayerState.PLAYING) {
+        if (viewModel.playerViewState.value?.playerState == TrackViewModel.PlayerState.PLAYING) {
             viewModel.togglePlayback()
         }
+    }
+
+    private fun updatePlayerState(state: TrackViewModel.PlayerState) {
+        when (state) {
+            TrackViewModel.PlayerState.LOADING -> {
+                binding.playButton.isEnabled = false
+                binding.playButton.setImageResource(R.drawable.play_button_100)
+            }
+            TrackViewModel.PlayerState.PREPARED -> {
+                binding.playButton.isEnabled = true
+                binding.playButton.setImageResource(R.drawable.play_button_100)
+            }
+            TrackViewModel.PlayerState.PLAYING -> {
+                binding.playButton.isEnabled = true
+                binding.playButton.setImageResource(R.drawable.stop_button_100)
+            }
+            TrackViewModel.PlayerState.PAUSED -> {
+                binding.playButton.isEnabled = true
+                binding.playButton.setImageResource(R.drawable.play_button_100)
+            }
+        }
+    }
+
+    private fun updateTrackPosition(position:  String) {
+        binding.trackTime.text = Transform.millisToMin(position)
     }
 
     private fun getTrackFromIntent(): Track {
@@ -88,23 +116,5 @@ class TrackActivity : AppCompatActivity() {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra(TRACK_READ)!!
         }
-    }
-
-    private fun showLoadingState() {
-        binding.playButton.isEnabled = false
-        binding.playButton.setImageResource(R.drawable.play_button_100)
-    }
-
-    private fun showPrepareState() {
-        binding.playButton.isEnabled = true
-        binding.playButton.setImageResource(R.drawable.play_button_100)
-    }
-
-    private fun showPlayingState() {
-        binding.playButton.setImageResource(R.drawable.stop_button_100)
-    }
-
-    private fun showPausedState() {
-        binding.playButton.setImageResource(R.drawable.play_button_100)
     }
 }

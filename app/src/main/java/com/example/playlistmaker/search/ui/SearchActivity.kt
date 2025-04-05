@@ -17,7 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.TrackActivity
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.search.ui.model.SearchState
+import com.example.playlistmaker.search.ui.model.SearchViewState
 
 class SearchActivity : AppCompatActivity() {
 
@@ -28,6 +29,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private lateinit var viewModel: SearchTrackViewModel
     private lateinit var trackAdapter: TrackAdapter
+
+    private var queryTextWatcher: TextWatcher? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,71 +43,59 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(this, SearchTrackViewModel.getViewModelFactory())[SearchTrackViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            SearchTrackViewModel.getViewModelFactory()
+        )[SearchTrackViewModel::class.java]
 
         trackAdapter = TrackAdapter(viewModel::onTrackClicked)
 
-        binding.searchResult.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.searchResult.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.searchResult.adapter = trackAdapter
 
-        val savedText = savedInstanceState?.getString(KEY_INPUT_TEXT)
-        if (savedText != null) {
-            viewModel.setSearchQuery(savedText)
-        }
-
-        viewModel.observeSearchQuery().observe(this) { query ->
-            if (query != binding.trackInput.text.toString()) {
-                binding.trackInput.setText(query)
-            }
+        viewModel.state.observe(this) { state ->
+            renderViewState(state)
+            handlerEvents(state.uiEvent)
         }
 
         binding.searchToolbar.setNavigationOnClickListener {
             finish()
         }
 
-        binding.trackInput.addTextChangedListener(object : TextWatcher {
+        queryTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchDebounce(s?.toString() ?: "")
+                viewModel.onQueryChanged(s?.toString() ?: "")
                 binding.clearText.isVisible = !s.isNullOrEmpty()
             }
 
             override fun afterTextChanged(s: Editable?) {
-                viewModel.setSearchQuery(s.toString())
+
             }
-        })
+        }
+        binding.trackInput.addTextChangedListener(queryTextWatcher)
 
         binding.clearText.setOnClickListener {
-            binding.trackInput.setText("")
-            val inputMethodManager =
-                getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(binding.trackInput.windowToken, 0)
-            binding.errorText.isVisible = false
-            binding.errorImage.isVisible = false
-            binding.refreshButton.isVisible = false
-            viewModel.loadHistory()
-            showHistory(viewModel.observeHistory().value ?: emptyList())
+            viewModel.clearSearch()
         }
 
         binding.trackInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && binding.trackInput.text.isEmpty()) {
                 viewModel.loadHistory()
-                showHistory(viewModel.observeHistory().value ?: emptyList())
             }
         }
 
         binding.trackInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (binding.trackInput.text.isNotEmpty()) {
-                    val query = binding.trackInput.text.toString()
-                    viewModel.searchDebounce(query)
-                }
+                hideKeyboard()
                 true
+            } else {
+                false
             }
-            false
         }
 
         binding.refreshButton.setOnClickListener {
@@ -113,30 +104,6 @@ class SearchActivity : AppCompatActivity() {
 
         binding.clearTrackHistoryButton.setOnClickListener {
             viewModel.clearHistory()
-            binding.searchResult.isVisible = false
-        }
-
-        viewModel.observeState().observe(this) { state ->
-            when (state) {
-                is SearchState.Loading -> showLoading()
-                is SearchState.Content -> showContent(state.tracks)
-                is SearchState.Error -> showError()
-                is SearchState.Empty -> showEmpty()
-            }
-        }
-
-        viewModel.observeHistory().observe(this) { history ->
-            showHistory(history)
-        }
-
-        viewModel.observeNavigateToTrack().observe(this) { track ->
-            startActivity(Intent(this, TrackActivity::class.java).apply {
-                putExtra("TRACK", track)
-            })
-        }
-
-        viewModel.observerShowToast().observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -147,63 +114,98 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(KEY_INPUT_TEXT, viewModel.observeSearchQuery().value ?: "")
-    }
-
-    private fun showError() {
-        binding.searchProgress.isVisible = false
-        binding.errorText.isVisible = true
-        binding.errorImage.isVisible = true
-        binding.errorText.setText(R.string.communication_problems)
-        binding.errorImage.setImageResource(R.drawable.download_failed_120)
-        binding.refreshButton.isVisible = true
-    }
-
-    private fun showHistory(history: List<Track>) {
-        if (history.isNotEmpty()) {
-            trackAdapter.updateData(history)
-            binding.findText.setText(R.string.find_line)
-            binding.findText.isVisible = true
-            binding.clearTrackHistoryButton.isVisible = true
-            binding.searchResult.isVisible = true
-        } else {
-            binding.findText.isVisible = false
-            binding.clearTrackHistoryButton.isVisible = false
+    override fun onDestroy() {
+        super.onDestroy()
+        queryTextWatcher?.let {
+            binding.trackInput.removeTextChangedListener(it)
         }
     }
 
-    private fun clearErrorState() {
-        binding.errorImage.isVisible = false
-        binding.errorText.isVisible = false
-        binding.refreshButton.isVisible = false
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_INPUT_TEXT, binding.trackInput.text.toString())
     }
 
-    private fun showLoading() {
-        binding.searchProgress.isVisible = true
-        clearErrorState()
-        binding.refreshButton.isVisible = false
-        binding.findText.isVisible = false
-        binding.clearTrackHistoryButton.isVisible = false
-        binding.searchResult.isVisible = false
+    private fun renderViewState(state: SearchViewState) {
+        val searchState = state.searchState
+        if (binding.trackInput.text.toString() != state.searchQuery) {
+            binding.trackInput.setText(state.searchQuery)
+            binding.trackInput.setSelection(state.searchQuery.length)
+        }
+
+        binding.clearText.isVisible = state.searchQuery.isNotEmpty()
+
+        binding.searchProgress.isVisible = searchState is SearchState.Loading
+        binding.errorImage.isVisible = searchState is SearchState.Error || searchState is SearchState.Empty
+        binding.errorText.isVisible = searchState is SearchState.Error || searchState is SearchState.Empty
+        binding.refreshButton.isVisible = searchState is SearchState.Error
+        binding.findText.isVisible = searchState is SearchState.History && searchState.tracks.isNotEmpty()
+        binding.clearTrackHistoryButton.isVisible = searchState is SearchState.History && searchState.tracks.isNotEmpty()
+
+        binding.searchResult.isVisible = when {
+            searchState is SearchState.Content -> true
+            searchState is SearchState.History && searchState.tracks.isNotEmpty() -> true
+            else -> false
+        }
+
+        when (searchState) {
+            is SearchState.Content -> {
+                trackAdapter.updateData(searchState.tracks)
+            }
+
+            is SearchState.History -> {
+                if (searchState.tracks.isNotEmpty()) {
+                    binding.findText.setText(R.string.find_line)
+                    trackAdapter.updateData(searchState.tracks)
+                } else {
+                    trackAdapter.updateData(emptyList())
+                }
+            }
+
+            is SearchState.Error -> {
+                binding.searchProgress.isVisible = false
+                binding.errorText.setText(R.string.communication_problems)
+                binding.errorImage.setImageResource(R.drawable.download_failed_120)
+                binding.refreshButton.isVisible = true
+                trackAdapter.updateData(emptyList())
+            }
+
+            is SearchState.Empty -> {
+                binding.searchProgress.isVisible = false
+                binding.errorText.setText(R.string.nothing_found)
+                binding.errorImage.setImageResource(R.drawable.nothing_found_120)
+                trackAdapter.updateData(emptyList())
+            }
+
+            is SearchState.Loading -> {
+                trackAdapter.updateData(emptyList())
+            }
+        }
     }
 
-    private fun showContent(track: List<Track>) {
-        binding.searchProgress.isVisible = false
-        clearErrorState()
-        binding.refreshButton.isVisible = false
-        binding.findText.isVisible = false
-        binding.searchResult.isVisible = true
-        trackAdapter.updateData(track)
+    private fun handlerEvents(events: SearchViewState.UiEvents) {
+        events.navigateToTrack?.let {
+            startActivity(Intent(this, TrackActivity::class.java).apply {
+                putExtra("TRACK", it)
+            })
+            viewModel.clearEvents()
+        }
+
+        events.showToast?.let {
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            viewModel.clearEvents()
+        }
+
+        if (events.hideKeyboard) {
+            hideKeyboard()
+            viewModel.clearEvents()
+        }
     }
 
-    private fun showEmpty() {
-        binding.searchProgress.isVisible = false
-        binding.errorText.isVisible = true
-        binding.errorImage.isVisible = true
-        binding.errorText.setText(R.string.nothing_found)
-        binding.errorImage.setImageResource(R.drawable.nothing_found_120)
-        binding.refreshButton.isVisible = true
+    private fun hideKeyboard() {
+        (getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager)?.apply {
+            hideSoftInputFromWindow(binding.trackInput.windowToken, 0)
+        }
     }
 }

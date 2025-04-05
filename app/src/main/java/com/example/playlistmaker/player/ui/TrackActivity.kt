@@ -60,7 +60,7 @@ class TrackActivity : AppCompatActivity() {
         binding.genreValue.text = viewModel.track.primaryGenreName
         binding.countryValue.text = viewModel.track.country
 
-        viewModel.observePlayerState().observe(this) { state ->
+        viewModel.playerState.observe(this) { state ->
             when (state) {
                 TrackViewModel.PlayerState.LOADING -> showLoadingState()
                 TrackViewModel.PlayerState.PREPARED -> showPrepareState()
@@ -69,14 +69,14 @@ class TrackActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.observeCurrentPosition().observe(this) { position ->
+        viewModel.currentPosition.observe(this) { position ->
             binding.trackTime.text = Transform.millisToMin(position.toString())
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.observePlayerState().value == TrackViewModel.PlayerState.PLAYING) {
+        if (viewModel.playerState.value == TrackViewModel.PlayerState.PLAYING) {
             viewModel.togglePlayback()
         }
     }

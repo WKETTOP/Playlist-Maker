@@ -1,25 +1,23 @@
 package com.example.playlistmaker.search.ui
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.TracksInteractor
 import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.search.ui.model.SearchState
+import com.example.playlistmaker.search.ui.model.SearchViewState
 import com.example.playlistmaker.util.Creator
 
 class SearchTrackViewModel(
     private val tracksInteractor: TracksInteractor,
-    application: Application
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
@@ -28,29 +26,15 @@ class SearchTrackViewModel(
 
         fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                SearchTrackViewModel(
-                    tracksInteractor = Creator.provideTracksInteractor(),
-                    application = this[APPLICATION_KEY] as Application)
+                SearchTrackViewModel(Creator.provideTracksInteractor())
             }
         }
     }
 
     private var handler = Handler(Looper.getMainLooper())
 
-    private val stateLiveData = MutableLiveData<SearchState>()
-    fun observeState(): LiveData<SearchState> = stateLiveData
-
-    private val searchQuery = MutableLiveData<String>()
-    fun observeSearchQuery(): LiveData<String> = searchQuery
-
-    private val history = MutableLiveData<List<Track>>()
-    fun observeHistory(): LiveData<List<Track>> = history
-
-    private val navigateToTrack = SingleLiveEvent<Track>()
-    fun observeNavigateToTrack(): LiveData<Track> = navigateToTrack
-
-    private val showToast = SingleLiveEvent<String>()
-    fun observerShowToast(): LiveData<String> = showToast
+    private val _state = MutableLiveData(SearchViewState())
+    val state: LiveData<SearchViewState> = _state
 
     private var lastSearchQuery: String? = null
     private var isTrackClickAllowed = true
@@ -63,8 +47,18 @@ class SearchTrackViewModel(
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
     }
 
-    fun setSearchQuery(query: String) {
-        searchQuery.postValue(query)
+    fun onQueryChanged(query: String) {
+        val currentState = _state.value ?: return
+
+        _state.postValue(currentState.copy(searchQuery = query))
+
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+
+        if (query.isEmpty()) {
+            handler.postDelayed({ showHistory() }, 100)
+        } else {
+            searchDebounce(query)
+        }
     }
 
     fun searchDebounce(changedText: String) {
@@ -86,24 +80,47 @@ class SearchTrackViewModel(
     }
 
     private fun performSearch(query: String) {
-        if (query.isNotEmpty()) {
-
-            stateLiveData.postValue(SearchState.Loading)
-
-            tracksInteractor.searchTrack(
-                query,
-                object : TracksInteractor.TracksConsumer {
-                    override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
-                       when {
-                           errorMessage != null -> handlerError(errorMessage)
-                           foundTracks.isNullOrEmpty() -> handleEmptyResults(errorMessage)
-                           else -> handleSuccess(foundTracks)
-                       }
-                    }
-
-                }
-            )
+        if (query.isEmpty()) {
+            return
         }
+        _state.postValue(
+            SearchViewState(
+                searchQuery = query,
+                searchState = SearchState.Loading,
+                uiEvent = SearchViewState.UiEvents()
+            )
+        )
+
+        tracksInteractor.searchTrack(
+            query,
+            object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
+                    val newState = when {
+                        errorMessage != null -> {
+                            _state.value?.copy(
+                                searchState = SearchState.Error(errorMessage),
+                                uiEvent = SearchViewState.UiEvents(showToast = errorMessage)
+                            )
+                        }
+
+                        foundTracks.isNullOrEmpty() -> {
+                            _state.value?.copy(
+                                searchState = SearchState.Empty("")
+                            )
+                        }
+
+                        else -> {
+                            _state.value?.copy(
+                                searchState = SearchState.Content(foundTracks)
+                            )
+                        }
+                    }
+                    newState?.let {
+                        _state.postValue(it)
+                    }
+                }
+            }
+        )
     }
 
     private fun trackClickDebounce(): Boolean {
@@ -115,33 +132,62 @@ class SearchTrackViewModel(
         return current
     }
 
+    private fun showHistory() {
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        val historyTracks = tracksInteractor.getTrackSearchHistory()
+        _state.postValue(
+            (_state.value ?: SearchViewState(
+                searchState = SearchState.History(emptyList())
+            )).copy(searchState = SearchState.History(historyTracks))
+        )
+    }
+
+    private fun triggerHideKeyboard() {
+        _state.postValue(
+            _state.value?.copy(
+                uiEvent = _state.value!!.uiEvent.copy(hideKeyboard = true)
+            ) ?: return
+        )
+    }
+
     fun onTrackClicked(track: Track) {
-        if (trackClickDebounce()) {
-            tracksInteractor.saveTrack(track)
-            navigateToTrack.postValue(track)
-        }
+        if (!trackClickDebounce()) return
+
+        tracksInteractor.saveTrack(track)
+        _state.postValue(
+            _state.value?.copy(
+                uiEvent = _state.value!!.uiEvent.copy(navigateToTrack = track)
+            ) ?: return
+        )
+    }
+
+    fun clearSearch() {
+        val currentState = _state.value ?: SearchViewState()
+        _state.value = currentState.copy(
+            searchQuery = "",
+            searchState = SearchState.History(tracksInteractor.getTrackSearchHistory())
+        )
+
+        lastSearchQuery = ""
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        triggerHideKeyboard()
     }
 
     fun clearHistory() {
         tracksInteractor.clearTrackSearchHistory()
-        loadHistory()
+        showHistory()
     }
 
     fun loadHistory() {
-        history.postValue(tracksInteractor.getTrackSearchHistory())
+        if (_state.value?.searchQuery.isNullOrEmpty()) {
+            showHistory()
+        }
     }
 
-    private fun handlerError(message: String) {
-        stateLiveData.postValue(SearchState.Error(getApplication<Application>().getString(R.string.communication_problems)))
-        showToast.postValue(message)
-    }
-
-    private fun handleEmptyResults(message: String?) {
-        stateLiveData.postValue(SearchState.Empty(getApplication<Application>().getString(R.string.nothing_found)))
-        showToast.postValue(message ?: "")
-    }
-
-    private fun handleSuccess(track: List<Track>) {
-        stateLiveData.postValue(SearchState.Content(track.toMutableList()))
+    fun clearEvents() {
+        val currentState = _state.value ?: return
+        if (currentState.uiEvent != SearchViewState.UiEvents()) {
+            _state.postValue(currentState.copy(uiEvent = SearchViewState.UiEvents()))
+        }
     }
 }

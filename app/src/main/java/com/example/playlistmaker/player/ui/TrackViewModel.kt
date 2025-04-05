@@ -20,6 +20,13 @@ class TrackViewModel(
     private val _track: Track
 ) : ViewModel() {
 
+    enum class PlayerState {
+        LOADING,
+        PREPARED,
+        PLAYING,
+        PAUSED
+    }
+
     companion object {
         private const val TRACK_PLAYING_DELAY = 500L
 
@@ -36,11 +43,11 @@ class TrackViewModel(
     val track: Track
         get() = _track
 
-    private val playerState = MutableLiveData<PlayerState>()
-    fun observePlayerState(): LiveData<PlayerState> = playerState
+    private val _playerState = MutableLiveData<PlayerState>()
+    val playerState: LiveData<PlayerState> = _playerState
 
-    private val currentPosition = MutableLiveData<Int>()
-    fun observeCurrentPosition(): LiveData<Int> = currentPosition
+    private val _currentPosition = MutableLiveData<Int>()
+    val currentPosition: LiveData<Int> = _currentPosition
 
     private var updateJob: Job? = null
 
@@ -57,25 +64,25 @@ class TrackViewModel(
     }
 
     private fun preparePlayer() {
-        playerState.value = PlayerState.LOADING
+        _playerState.value = PlayerState.LOADING
         trackPlayerInteractor.prepareTrack(track.previewUrl) {
-            playerState.postValue(PlayerState.PREPARED)
+            _playerState.postValue(PlayerState.PREPARED)
         }
         trackPlayerInteractor.setOnCompletionListener {
-            playerState.postValue(PlayerState.PREPARED)
+            _playerState.postValue(PlayerState.PREPARED)
             updateJob?.cancel()
         }
     }
 
     private fun startPlayer() {
         trackPlayerInteractor.startPlayback()
-        playerState.value = PlayerState.PLAYING
+        _playerState.value = PlayerState.PLAYING
         startPositionUpdate()
     }
 
     private fun pausePlayer() {
         trackPlayerInteractor.pausePlayback()
-        playerState.value = PlayerState.PAUSED
+        _playerState.value = PlayerState.PAUSED
         stopPositionUpdate()
     }
 
@@ -83,7 +90,7 @@ class TrackViewModel(
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
             while (isActive) {
-                currentPosition.postValue(trackPlayerInteractor.getCurrentPosition())
+                _currentPosition.postValue(trackPlayerInteractor.getCurrentPosition())
                 delay(TRACK_PLAYING_DELAY)
             }
         }
@@ -97,9 +104,5 @@ class TrackViewModel(
         super.onCleared()
         trackPlayerInteractor.releasePlayback()
         updateJob?.cancel()
-    }
-
-    enum class PlayerState {
-        LOADING, PREPARED, PLAYING, PAUSED
     }
 }

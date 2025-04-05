@@ -16,8 +16,8 @@ class SettingsViewModel(
     private val sharingInteractor: SharingInteractor,
 ) : ViewModel() {
 
-    private val isDarkThemeEnabled = MutableLiveData<Boolean>()
-    fun observeThemeMode(): LiveData<Boolean> = isDarkThemeEnabled
+    private val _isDarkThemeEnabled = MutableLiveData<Boolean>()
+    val isDarkThemeEnabled: LiveData<Boolean> = _isDarkThemeEnabled
 
     init {
         updateThemeState()
@@ -35,13 +35,13 @@ class SettingsViewModel(
     }
 
     private fun updateThemeState() {
-         isDarkThemeEnabled.value = themeManager.isDarkThemeEnabledNow()
+        _isDarkThemeEnabled.value = themeManager.isDarkThemeEnabledNow()
     }
 
     fun onThemeSwitched(isChecked: Boolean) {
         themeManager.switchThemeSettings(isChecked)
         updateThemeState()
-        isDarkThemeEnabled.value = isChecked
+        _isDarkThemeEnabled.value = isChecked
     }
 
     fun onShareClicked() {

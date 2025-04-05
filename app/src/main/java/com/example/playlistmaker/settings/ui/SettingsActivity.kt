@@ -30,7 +30,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel.observeThemeMode().observe(this) { isDark ->
+        viewModel.isDarkThemeEnabled.observe(this) { isDark ->
             binding.darkThemeSwitch.isChecked = isDark
         }
 

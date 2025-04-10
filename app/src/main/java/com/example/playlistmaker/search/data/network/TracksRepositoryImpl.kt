@@ -16,7 +16,7 @@ class TracksRepositoryImpl(
         val response = networkClient.doRequest(TrackSearchRequest(expression))
         return when (response.resultCode) {
             -1 -> {
-                Resource.Error("Проверьте подключение к интернету")
+                Resource.Error("Check your internet connection")
             }
             200 -> {
                 Resource.Success((response as TracksSearchResponse).results.map { trackDto ->
@@ -24,7 +24,7 @@ class TracksRepositoryImpl(
                 })
             }
             else -> {
-                Resource.Error("Ошибка сервера")
+                Resource.Error("Server error")
             }
         }
 

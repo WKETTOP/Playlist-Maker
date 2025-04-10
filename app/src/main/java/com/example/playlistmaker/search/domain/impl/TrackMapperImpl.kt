@@ -21,5 +21,4 @@ class TrackMapperImpl : TrackMapper {
             previewUrl = trackDto.previewUrl
         )
     }
-
 }

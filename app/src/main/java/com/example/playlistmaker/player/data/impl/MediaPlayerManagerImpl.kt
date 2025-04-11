@@ -3,9 +3,10 @@ package com.example.playlistmaker.player.data.impl
 import android.media.MediaPlayer
 import com.example.playlistmaker.player.domain.MediaPlayerManager
 
-class MediaPlayerManagerImpl : MediaPlayerManager {
-    private var mediaPlayer: MediaPlayer? = null
+class MediaPlayerManagerImpl(
+    private var mediaPlayer: MediaPlayer? = null,
     private var onCompleteListener: (() -> Unit)? = null
+) : MediaPlayerManager {
 
     override fun prepare(url: String, onPrepared: () -> Unit) {
         mediaPlayer = MediaPlayer().apply {

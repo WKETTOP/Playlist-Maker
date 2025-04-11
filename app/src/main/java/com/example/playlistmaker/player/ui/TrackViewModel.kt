@@ -3,14 +3,10 @@ package com.example.playlistmaker.player.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
 import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.util.Creator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -30,15 +26,6 @@ class TrackViewModel(
 
     companion object {
         private const val TRACK_PLAYING_DELAY = 500L
-
-        fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                TrackViewModel(
-                    trackPlayerInteractor = Creator.provideTrackPlayer(),
-                    _track = track
-                )
-            }
-        }
     }
 
     val track: Track

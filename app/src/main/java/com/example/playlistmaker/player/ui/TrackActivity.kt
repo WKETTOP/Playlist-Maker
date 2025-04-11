@@ -3,7 +3,6 @@ package com.example.playlistmaker.player.ui
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -13,6 +12,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityTrackBinding
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Transform
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class TrackActivity : AppCompatActivity() {
 
@@ -22,9 +23,7 @@ class TrackActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTrackBinding
 
-    private val viewModel: TrackViewModel by viewModels {
-        TrackViewModel.getViewModelFactory(getTrackFromIntent())
-    }
+    private val viewModel by viewModel<TrackViewModel>{ parametersOf(getTrackFromIntent()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

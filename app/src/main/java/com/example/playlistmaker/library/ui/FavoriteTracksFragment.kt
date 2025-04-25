@@ -10,14 +10,19 @@ import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 
 class FavoriteTracksFragment : Fragment() {
 
-    private lateinit var binding: FragmentFavoriteTracksBinding
+    private var _binding: FragmentFavoriteTracksBinding? = null
+    private val binding get() = _binding!!
+
+    companion object {
+        fun newInstance() = FavoriteTracksFragment()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentFavoriteTracksBinding.inflate(inflater, container, false)
+        _binding = FragmentFavoriteTracksBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -25,5 +30,10 @@ class FavoriteTracksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.errorImage.setImageResource(R.drawable.nothing_found_120)
         binding.errorText.setText(R.string.favorite_tracks_empty_line)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

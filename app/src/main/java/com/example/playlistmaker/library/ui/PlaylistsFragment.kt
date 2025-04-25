@@ -11,14 +11,19 @@ import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 
 class PlaylistsFragment : Fragment() {
 
-    private lateinit var binding: FragmentPlaylistsBinding
+    private var _binding: FragmentPlaylistsBinding? = null
+    private val binding get() = _binding!!
+
+    companion object {
+        fun newInstance() = PlaylistsFragment()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPlaylistsBinding.inflate(inflater, container, false)
+        _binding = FragmentPlaylistsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -27,5 +32,10 @@ class PlaylistsFragment : Fragment() {
         binding.newPlaylistButton.isVisible = true
         binding.errorImage.setImageResource(R.drawable.nothing_found_120)
         binding.errorText.setText(R.string.playlists_empty_line)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

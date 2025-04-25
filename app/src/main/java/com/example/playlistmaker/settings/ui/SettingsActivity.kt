@@ -5,7 +5,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         enableEdgeToEdge()
-        setOnApplyWindowInsetsListener(findViewById(R.id.setting_page)) { v, insets ->
+        setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets

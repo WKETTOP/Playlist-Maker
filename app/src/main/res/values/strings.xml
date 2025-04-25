@@ -25,4 +25,9 @@
     <string name="year_line">Year</string>
     <string name="genre_line">Genre</string>
     <string name="country_line">Country</string>
+    <string name="favorite_tracks_empty_line">Your library is empty</string>
+    <string name="playlists_empty_line">You haven\'t created any playlists</string>
+    <string name="new_playlist">New playlist</string>
+    <string name="favorite_track_line">Favorite tracks</string>
+    <string name="playlists_line">Playlists</string>
 </resources>

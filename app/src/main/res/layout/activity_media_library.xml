@@ -24,6 +24,7 @@
         android:background="@color/white_night"
         app:tabTextAppearance="@style/RoundedButtonTextStyle"
         app:tabTextColor="@color/black_night"
+        app:tabIndicator="@drawable/media_library_tab_indicator"
         app:tabIndicatorColor="@color/black_night"/>
 
     <androidx.viewpager2.widget.ViewPager2

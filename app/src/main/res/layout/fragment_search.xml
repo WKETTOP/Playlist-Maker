@@ -2,18 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/search_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_night"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.example.playlistmaker.search.ui.SearchFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
         app:title="@string/search_line"
         app:titleTextAppearance="@style/TitleStyle"
         app:titleTextColor="@color/black_night" />
@@ -105,10 +104,10 @@
             android:id="@+id/search_progress"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:layout_marginTop="140dp"
             android:layout_gravity="center"
+            android:layout_marginTop="140dp"
             android:indeterminateTint="@color/blue"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_result"
@@ -116,7 +115,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/icon_24"
             android:layout_weight="1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <Button
             android:id="@+id/clear_track_history_button"

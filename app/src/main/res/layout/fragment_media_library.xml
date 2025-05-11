@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/media_library_page"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white_night"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/white_night"
+    android:orientation="vertical"
+    tools:context="com.example.playlistmaker.library.ui.MediaLibraryFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/back_button"
+        android:id="@+id/media_library_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
         app:title="@string/media_library_line"
         app:titleTextAppearance="@style/TitleStyle"
         app:titleTextColor="@color/black_night" />
@@ -22,13 +22,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white_night"
-        app:tabTextAppearance="@style/RoundedButtonTextStyle"
-        app:tabTextColor="@color/black_night"
         app:tabIndicator="@drawable/media_library_tab_indicator"
-        app:tabIndicatorColor="@color/black_night"/>
+        app:tabIndicatorColor="@color/black_night"
+        app:tabTextAppearance="@style/RoundedButtonTextStyle"
+        app:tabTextColor="@color/black_night" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/media_library_viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

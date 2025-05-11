@@ -15,7 +15,7 @@ class PlaylistsFragment : Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance() = PlaylistsFragment()
+        fun createArgs() = PlaylistsFragment()
     }
 
     override fun onCreateView(

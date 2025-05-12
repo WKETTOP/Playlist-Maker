@@ -14,7 +14,7 @@ class FavoriteTracksFragment : Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance() = FavoriteTracksFragment()
+        fun createArgs() = FavoriteTracksFragment()
     }
 
     override fun onCreateView(

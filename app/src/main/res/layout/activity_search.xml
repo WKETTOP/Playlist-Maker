@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white_night"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/search_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentInsetStartWithNavigation="0dp"
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:title="@string/search_line"
+        app:titleTextAppearance="@style/TitleStyle"
+        app:titleTextColor="@color/black_night" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_16"
+        android:layout_marginTop="@dimen/padding_8"
+        android:background="@drawable/rounded_corners">
+
+        <EditText
+            android:id="@+id/track_input"
+            android:layout_width="328dp"
+            android:layout_height="36dp"
+            android:background="@null"
+            android:drawableStart="@drawable/search"
+            android:drawablePadding="@dimen/padding_8"
+            android:fontFamily="@font/ys_display_regular"
+            android:hint="@string/search_line"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLength="100"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey_black"
+            android:textCursorDrawable="@drawable/cursor_color"
+            android:textSize="@dimen/size_16" />
+
+        <ImageView
+            android:id="@+id/clear_text"
+            android:layout_width="@dimen/icon_24"
+            android:layout_height="@dimen/icon_24"
+            android:layout_gravity="end"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="@dimen/padding_8"
+            android:contentDescription="@string/clear_line"
+            android:src="@drawable/clear_button_24"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/error_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="102dp"
+        android:visibility="gone"
+        tools:src="@drawable/download_failed_120" />
+
+    <TextView
+        android:id="@+id/error_text"
+        style="@style/ErrorTextStyle"
+        android:visibility="gone"
+        tools:text="@string/communication_problems" />
+
+    <Button
+        android:id="@+id/refresh_button"
+        style="@style/RoundedButtonStyle"
+        android:text="@string/refresh_line"
+        android:visibility="gone"
+        app:cornerRadius="54dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/find_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/icon_24"
+            android:layout_marginTop="@dimen/padding_42"
+            android:fontFamily="@font/ys_display_medium"
+            android:gravity="center"
+            android:textColor="@color/black_night"
+            android:textFontWeight="400"
+            android:textSize="19sp"
+            android:visibility="gone"
+            tools:text="@string/find_line" />
+
+        <ProgressBar
+            android:id="@+id/search_progress"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="140dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/blue"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_result"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/icon_24"
+            android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+        <Button
+            android:id="@+id/clear_track_history_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/icon_24"
+            android:backgroundTint="@color/black_night"
+            android:fontFamily="@font/ys_display_medium"
+            android:letterSpacing="0"
+            android:text="@string/clear_track_history_line"
+            android:textAllCaps="false"
+            android:textColor="@color/white_night"
+            android:textFontWeight="500"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:cornerRadius="54dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

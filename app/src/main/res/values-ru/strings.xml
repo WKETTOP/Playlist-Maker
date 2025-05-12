@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_line">Поиск</string>
+    <string name="media_library_line">Медиатека</string>
+    <string name="settings_line">Настройки</string>
+    <string name="back_line">Назад</string>
+    <string name="dark_theme_line">Тёмная тема</string>
+    <string name="share_app_line">Поделиться приложением</string>
+    <string name="support_line">Написать в поддержку</string>
+    <string name="user_agreement_line">Пользовательское соглашение</string>
+    <string name="support_email_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_email_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="clear_line">Очистить</string>
+    <string name="nothing_found">Ничего не нашлось</string>
+    <string name="communication_problems">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="app_not_found">Не найдено подходящего приложения</string>
+    <string name="refresh_line">Обновить</string>
+    <string name="find_line">Вы искали</string>
+    <string name="clear_track_history_line">Очистить историю</string>
+    <string name="duration_line">Длительность</string>
+    <string name="album_line">Альбом</string>
+    <string name="year_line">Год</string>
+    <string name="genre_line">Genre</string>
+    <string name="country_line">Страна</string>
+    <string name="favorite_tracks_empty_line">Ваша медиатека пуста</string>
+    <string name="playlists_empty_line">Вы не создали\n ни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="favorite_track_line">Избранные треки</string>
+    <string name="playlists_line">Плейлисты</string>
+</resources>

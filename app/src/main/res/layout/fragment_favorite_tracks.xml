@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/error_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="106dp"
+        android:visibility="visible"
+        tools:src="@drawable/nothing_found_120" />
+
+    <TextView
+        android:id="@+id/error_text"
+        style="@style/ErrorTextStyle"
+        android:layout_marginTop="242dp"
+        android:layout_gravity="center_horizontal"
+        tools:text="@string/favorite_tracks_empty_line"/>
+
+</FrameLayout>

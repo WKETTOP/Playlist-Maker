@@ -5,7 +5,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
@@ -26,11 +25,6 @@ class RootActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.rootFragmentContainerView.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            binding.bottomNavigationView.isVisible = !imeVisible
-            ViewCompat.requestApplyInsets(binding.root)
-
             insets
         }
 

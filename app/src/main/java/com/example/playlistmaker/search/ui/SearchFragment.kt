@@ -116,7 +116,8 @@ class SearchFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(KEY_INPUT_TEXT, binding.trackInput.text?.toString() ?: "")
+        val inputText = binding.trackInput.text?.toString() ?: ""
+        outState.putString(KEY_INPUT_TEXT, inputText)
     }
 
     private fun renderViewState(state: SearchViewState) {

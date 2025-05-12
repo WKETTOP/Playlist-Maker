@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/white_night"
+    android:fitsSystemWindows="true"
     tools:context=".root.ui.RootActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -15,17 +15,27 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="72dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
+        app:layout_constraintBottom_toTopOf="@id/elevation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/main_navigation_graph" />
+
+    <View
+        android:id="@+id/elevation"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey_light"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white_night"
+        app:elevation="0dp"
         app:itemIconTint="@color/bottom_navigation_items_color"
         app:itemRippleColor="@color/blue"
         app:itemTextAppearanceActive="@font/ys_display_regular"

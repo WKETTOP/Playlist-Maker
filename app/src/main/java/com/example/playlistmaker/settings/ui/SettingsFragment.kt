@@ -40,10 +40,6 @@ class SettingsFragment : Fragment() {
             }
         }
 
-//        viewModel.isDarkThemeEnabled.observe(viewLifecycleOwner) { isDark ->
-//            binding.darkThemeSwitch.isChecked = isDark
-//        }
-
         binding.shareButton.setOnClickListener {
             viewModel.onShareClicked()
         }

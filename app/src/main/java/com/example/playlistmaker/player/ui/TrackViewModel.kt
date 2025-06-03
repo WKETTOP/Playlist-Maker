@@ -1,7 +1,5 @@
 package com.example.playlistmaker.player.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
@@ -9,6 +7,9 @@ import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.search.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -31,8 +32,8 @@ class TrackViewModel(
     val track: Track
         get() = _track
 
-    private val _playerViewState = MutableLiveData<PlayerViewState>()
-    val playerViewState: LiveData<PlayerViewState> = _playerViewState
+    private val _playerViewState = MutableStateFlow(PlayerViewState())
+    val playerViewState: StateFlow<PlayerViewState> = _playerViewState.asStateFlow()
 
     private var updateJob: Job? = null
 
@@ -45,7 +46,7 @@ class TrackViewModel(
     }
 
     fun togglePlayback() {
-        when (_playerViewState.value?.playerState) {
+        when (_playerViewState.value.playerState) {
             PlayerState.PLAYING -> pausePlayer()
             PlayerState.PAUSED, PlayerState.PREPARED -> startPlayer()
             else -> {}
@@ -94,7 +95,7 @@ class TrackViewModel(
         playerState: PlayerState? = null,
         currentPosition: String? = null
     ) {
-        val current = _playerViewState.value ?: PlayerViewState()
+        val current = _playerViewState.value
         _playerViewState.value = current.copy(
             playerState = playerState ?: current.playerState,
             currentPosition = currentPosition ?: current.currentPosition

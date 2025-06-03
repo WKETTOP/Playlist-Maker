@@ -5,7 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.playlistmaker.databinding.FragmentSettingsBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : Fragment() {
@@ -26,8 +31,13 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.isDarkThemeEnabled.observe(viewLifecycleOwner) { isDark ->
-            binding.darkThemeSwitch.isChecked = isDark
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isDarkThemeEnabled.collectLatest { isDark ->
+                    binding.darkThemeSwitch.isChecked = isDark
+                }
+            }
         }
 
         binding.shareButton.setOnClickListener {

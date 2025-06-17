@@ -132,58 +132,66 @@ class SearchTrackViewModel(
     }
 
     private fun showHistory() {
-        val historyTracks = tracksInteractor.getTrackSearchHistory()
-        _state.update { currentState ->
-            currentState.copy(searchState = SearchState.History(historyTracks))
+        viewModelScope.launch {
+            val historyTracks = tracksInteractor.getTrackSearchHistory()
+            _state.update { currentState ->
+                currentState.copy(searchState = SearchState.History(historyTracks))
+            }
+
         }
 
     }
 
-    private fun triggerHideKeyboard() {
-        _state.update { currentState ->
-            currentState.copy(
-                uiEvent = _state.value.uiEvent.copy(hideKeyboard = true)
-            )
-        }
-    }
-
-    fun onTrackClicked(track: Track) {
-        if (!trackClickDebounce()) return
-
-        tracksInteractor.saveTrack(track)
-        _state.update { currentState ->
-            currentState.copy(
-                uiEvent = _state.value.uiEvent.copy(navigateToTrack = track)
-            )
-        }
-    }
-
-    fun clearSearch() {
-        _state.update { currentState ->
-            currentState.copy(
-                searchQuery = "",
-                searchState = SearchState.History(tracksInteractor.getTrackSearchHistory())
-            )
+        private fun triggerHideKeyboard() {
+            _state.update { currentState ->
+                currentState.copy(
+                    uiEvent = _state.value.uiEvent.copy(hideKeyboard = true)
+                )
+            }
         }
 
-        lastSearchQuery = ""
-        triggerHideKeyboard()
-    }
+        fun onTrackClicked(track: Track) {
+            if (!trackClickDebounce()) return
 
-    fun clearHistory() {
-        tracksInteractor.clearTrackSearchHistory()
-        showHistory()
-    }
+            viewModelScope.launch {
+                tracksInteractor.saveTrack(track)
+                _state.update { currentState ->
+                    currentState.copy(
+                        uiEvent = _state.value.uiEvent.copy(navigateToTrack = track)
+                    )
+                }
+            }
 
-    fun loadHistory() {
-        if (_state.value.searchQuery.isEmpty()) {
+        }
+
+        fun clearSearch() {
+            viewModelScope.launch {
+                _state.update { currentState ->
+                    currentState.copy(
+                        searchQuery = "",
+                        searchState = SearchState.History(tracksInteractor.getTrackSearchHistory())
+                    )
+                }
+            }
+
+            lastSearchQuery = ""
+            triggerHideKeyboard()
+        }
+
+        fun clearHistory() {
+            tracksInteractor.clearTrackSearchHistory()
             showHistory()
         }
-    }
 
-    fun clearEvents() {
-        _state.update { currentState ->
-            currentState.copy(uiEvent = SearchViewState.UiEvents())
+        fun loadHistory() {
+            if (_state.value.searchQuery.isEmpty()) {
+                showHistory()
+            }
+        }
+
+        fun clearEvents() {
+            _state.update { currentState ->
+                currentState.copy(uiEvent = SearchViewState.UiEvents())
+            }
         }
     }
-}

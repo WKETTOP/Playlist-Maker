@@ -4,7 +4,7 @@ import com.example.playlistmaker.search.domain.model.Track
 
 sealed interface SearchState {
 
-    object Loading : SearchState
+    data object Loading : SearchState
 
     data class Content(val tracks: List<Track>) : SearchState
 

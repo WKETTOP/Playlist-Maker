@@ -1,8 +1,10 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.library.data.FavoriteTracksRepositoryImpl
+import com.example.playlistmaker.library.domain.dp.FavoriteTracksRepository
 import com.example.playlistmaker.player.data.impl.MediaPlayerManagerImpl
 import com.example.playlistmaker.player.domain.MediaPlayerManager
-import com.example.playlistmaker.search.data.network.TracksRepositoryImpl
+import com.example.playlistmaker.search.data.TracksRepositoryImpl
 import com.example.playlistmaker.search.domain.TracksRepository
 import com.example.playlistmaker.search.domain.impl.TrackMapperImpl
 import com.example.playlistmaker.search.domain.model.TrackMapper
@@ -22,10 +24,14 @@ val repositoryModule = module {
     }
 
     single<TracksRepository> {
-        TracksRepositoryImpl(get(), get())
+        TracksRepositoryImpl(get(), get(), get())
     }
 
     single<AppSettingsRepository> {
         AppSettingsRepositoryImpl(androidContext())
+    }
+
+    single<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get(), get())
     }
 }

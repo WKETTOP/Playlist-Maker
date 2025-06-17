@@ -2,6 +2,7 @@ package com.example.playlistmaker.player.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.library.domain.dp.FavoriteTracksInteractor
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
 import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.search.domain.model.Track
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class TrackViewModel(
     private val trackPlayerInteractor: TrackPlayerInteractor,
-    private val _track: Track
+    private val _track: Track,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor
 ) : ViewModel() {
 
     enum class PlayerState {
@@ -35,6 +37,9 @@ class TrackViewModel(
     private val _playerViewState = MutableStateFlow(PlayerViewState())
     val playerViewState: StateFlow<PlayerViewState> = _playerViewState.asStateFlow()
 
+    private val _isFavorite = MutableStateFlow(track.isFavorite)
+    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+
     private var updateJob: Job? = null
 
     init {
@@ -53,10 +58,27 @@ class TrackViewModel(
         }
     }
 
+    fun onFavoriteClick() {
+        viewModelScope.launch {
+            val isCurrentFavorite = _isFavorite.value
+
+            if (isCurrentFavorite) {
+                favoriteTracksInteractor.deleteTrackFromFavorite(track)
+            } else {
+                favoriteTracksInteractor.addTrackToFavorite(track)
+            }
+
+            _isFavorite.value = !isCurrentFavorite
+        }
+    }
+
     private fun preparePlayer() {
         updateViewState(playerState = PlayerState.LOADING)
         trackPlayerInteractor.prepareTrack(track.previewUrl) {
-            updateViewState(playerState = PlayerState.PREPARED, currentPosition = track.formattedTrackTime)
+            updateViewState(
+                playerState = PlayerState.PREPARED,
+                currentPosition = track.formattedTrackTime
+            )
         }
         trackPlayerInteractor.setOnCompletionListener {
             updateViewState(playerState = PlayerState.PREPARED, currentPosition = "00:00")

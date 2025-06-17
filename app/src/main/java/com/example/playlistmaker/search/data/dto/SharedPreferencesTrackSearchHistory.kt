@@ -1,28 +1,36 @@
 package com.example.playlistmaker.search.data.dto
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.library.data.AppDatabase
 import com.example.playlistmaker.search.domain.TrackSearchHistory
 import com.example.playlistmaker.search.domain.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class SharedPreferencesTrackSearchHistory(private val prefs: SharedPreferences) :
-    TrackSearchHistory {
+class SharedPreferencesTrackSearchHistory(
+    private val prefs: SharedPreferences,
+    private val appDatabase: AppDatabase
+) : TrackSearchHistory {
 
     companion object {
         const val HISTORY_KEY = "track_search_history"
         private const val TRACK_SEARCH_MAX_SIZE = 10
     }
 
-
-    override fun getTrackSearchHistory(): List<Track> {
+    override suspend fun getTrackSearchHistory(): List<Track> {
         val json = prefs.getString(HISTORY_KEY, null) ?: return emptyList()
         val type = object : TypeToken<List<Track>>() {}.type
-        return Gson().fromJson(json, type) ?: emptyList()
+        val tracks: List<Track> = Gson().fromJson(json, type) ?: emptyList()
+
+        val tracksIdInFavorite = appDatabase.trackDao().getTracksId().toSet()
+
+        return tracks.map { track ->
+            track.copy(isFavorite = track.trackId in tracksIdInFavorite)
+        }
     }
 
 
-    override fun saveTrack(track: Track) {
+    override suspend fun saveTrack(track: Track) {
         val historyTrack = getTrackSearchHistory().toMutableList()
 
         historyTrack.removeAll { it.trackId == track.trackId }

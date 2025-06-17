@@ -18,7 +18,8 @@ class TrackMapperImpl : TrackMapper {
             formattedReleaseDate = Transform.dateToYear(trackDto.releaseDate),
             primaryGenreName = trackDto.primaryGenreName,
             country = trackDto.country,
-            previewUrl = trackDto.previewUrl
+            previewUrl = trackDto.previewUrl,
+            isFavorite = false
         )
     }
 }

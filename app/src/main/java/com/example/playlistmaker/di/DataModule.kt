@@ -49,4 +49,8 @@ val dataModule = module {
     single<ExternalNavigator> {
         ExternalNavigatorImpl(androidContext())
     }
+
+    single {
+        get<AppDatabase>().trackDao()
+    }
 }

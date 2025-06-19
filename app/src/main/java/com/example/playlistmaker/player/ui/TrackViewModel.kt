@@ -37,10 +37,11 @@ class TrackViewModel(
     private val _playerViewState = MutableStateFlow(PlayerViewState())
     val playerViewState: StateFlow<PlayerViewState> = _playerViewState.asStateFlow()
 
-    private val _isFavorite = MutableStateFlow(track.isFavorite)
+    private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
 
     private var updateJob: Job? = null
+    private var favoriteJob: Job? = null
 
     init {
         _playerViewState.value = PlayerViewState(
@@ -48,6 +49,13 @@ class TrackViewModel(
             currentPosition = _track.formattedTrackTime
         )
         preparePlayer()
+
+        favoriteJob?.cancel()
+        favoriteJob = viewModelScope.launch {
+            favoriteTracksInteractor.getFavoriteTracksId().collect { favoriteIds ->
+                _isFavorite.value = favoriteIds.contains(track.trackId)
+            }
+        }
     }
 
     fun togglePlayback() {
@@ -128,5 +136,6 @@ class TrackViewModel(
         super.onCleared()
         trackPlayerInteractor.releasePlayback()
         updateJob?.cancel()
+        favoriteJob?.cancel()
     }
 }

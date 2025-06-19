@@ -19,19 +19,19 @@ val interactorModule = module {
         TrackPlayerInteractorImpl(get())
     }
 
-    single<TracksInteractor> {
+    factory<TracksInteractor> {
         TracksInteractorImpl(get(), get())
     }
 
-    single<ThemeManager> {
+    factory<ThemeManager> {
         ThemeManagerImpl(get(), androidContext())
     }
 
-    single<SharingInteractor> {
+    factory<SharingInteractor> {
         SharingInteractorImpl(get())
     }
 
-    single<FavoriteTracksInteractor> {
+    factory<FavoriteTracksInteractor> {
         FavoriteTracksInteractorImpl(get())
     }
 }

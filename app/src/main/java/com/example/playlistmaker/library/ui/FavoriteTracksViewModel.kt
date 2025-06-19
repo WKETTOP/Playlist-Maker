@@ -32,7 +32,7 @@ class FavoriteTracksViewModel(
         if (tracks.isEmpty()) {
             _favoriteTracksViewState.update { FavoriteTracksViewState.Empty }
         } else {
-            _favoriteTracksViewState.update {FavoriteTracksViewState.Content(tracks) }
+            _favoriteTracksViewState.update { FavoriteTracksViewState.Content(tracks) }
         }
     }
 }

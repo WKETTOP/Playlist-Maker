@@ -24,15 +24,15 @@ val repositoryModule = module {
         MediaPlayerManagerImpl()
     }
 
-    single<TracksRepository> {
+    factory<TracksRepository> {
         TracksRepositoryImpl(get(), get(), get())
     }
 
-    single<AppSettingsRepository> {
+    factory<AppSettingsRepository> {
         AppSettingsRepositoryImpl(androidContext())
     }
 
-    single<FavoriteTracksRepository> {
+    factory<FavoriteTracksRepository> {
         FavoriteTracksRepositoryImpl(get(), get())
     }
 

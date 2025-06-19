@@ -13,7 +13,7 @@ class FavoriteTracksRepositoryImpl(
 ) : FavoriteTracksRepository {
 
     override suspend fun addTrackToFavorite(track: Track) {
-       appDatabase.trackDao().insertTrack(trackDbConverter.map(track))
+        appDatabase.trackDao().insertTrack(trackDbConverter.map(track))
     }
 
     override suspend fun deleteTrackFromFavorite(track: Track) {

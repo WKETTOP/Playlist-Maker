@@ -6,9 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
@@ -52,13 +50,16 @@ class FavoriteTracksFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.favoriteTracks.adapter = trackAdapter
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.favoriteTracksViewState.collect { state ->
-                    renderState(state)
-                }
+        lifecycleScope.launch {
+            viewModel.favoriteTracksViewState.collect { state ->
+                renderState(state)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fillData()
     }
 
     private fun navigateToTrackPlayer(track: Track) {
@@ -67,28 +68,31 @@ class FavoriteTracksFragment : Fragment() {
         }
 
         findNavController().navigate(
-            R.id.action_favoriteTracksFragment_to_trackActivity,
+            R.id.action_mediaLibraryFragment_to_trackActivity,
             args
         )
     }
 
     private fun renderState(state: FavoriteTracksViewState) {
-        when(state) {
+        when (state) {
             is FavoriteTracksViewState.Empty -> showEmpty()
             is FavoriteTracksViewState.Content -> showContent(state.tracks)
         }
     }
 
     private fun showEmpty() {
+        binding.favoriteTracksProgress.isVisible = false
         binding.errorText.isVisible = true
         binding.errorImage.isVisible = true
         binding.favoriteTracks.isVisible = false
 
+        trackAdapter.updateData(emptyList())
         binding.errorText.setText(R.string.favorite_tracks_empty_line)
         binding.errorImage.setImageResource(R.drawable.nothing_found_120)
     }
 
     private fun showContent(tracks: List<Track>) {
+        binding.favoriteTracksProgress.isVisible = false
         binding.errorText.isVisible = false
         binding.errorImage.isVisible = false
         binding.favoriteTracks.isVisible = true

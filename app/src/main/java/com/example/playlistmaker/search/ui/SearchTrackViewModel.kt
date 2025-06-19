@@ -134,12 +134,11 @@ class SearchTrackViewModel(
     private fun showHistory() {
         viewModelScope.launch {
             val historyTracks = tracksInteractor.getTrackSearchHistory()
-            _state.update { currentState ->
-                currentState.copy(searchState = SearchState.History(historyTracks))
-            }
 
+            _state.value = _state.value.copy(
+                searchState = SearchState.History(historyTracks)
+            )
         }
-
     }
 
         private fun triggerHideKeyboard() {
@@ -161,7 +160,6 @@ class SearchTrackViewModel(
                     )
                 }
             }
-
         }
 
         fun clearSearch() {

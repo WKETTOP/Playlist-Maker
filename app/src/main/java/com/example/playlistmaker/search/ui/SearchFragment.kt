@@ -119,7 +119,7 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (binding.trackInput.text.isEmpty() && binding.trackInput.hasFocus()) {
+        if (binding.trackInput.text.isEmpty() && !binding.trackInput.hasFocus() || binding.trackInput.hasFocus()) {
             viewModel.loadHistory()
         }
     }

@@ -3,7 +3,6 @@ package com.example.playlistmaker.di
 import android.content.Context
 import androidx.room.Room
 import com.example.playlistmaker.library.data.AppDatabase
-import com.example.playlistmaker.library.data.converters.TrackDbConverter
 import com.example.playlistmaker.search.data.dto.SharedPreferencesTrackSearchHistory
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -36,8 +35,6 @@ val dataModule = module {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
             .build()
     }
-
-    single { TrackDbConverter() }
 
     factory { Gson() }
 

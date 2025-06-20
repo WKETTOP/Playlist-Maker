@@ -1,6 +1,8 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
+import androidx.room.Room
+import com.example.playlistmaker.library.data.AppDatabase
 import com.example.playlistmaker.search.data.dto.SharedPreferencesTrackSearchHistory
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -29,10 +31,15 @@ val dataModule = module {
             .getSharedPreferences("track_search_history", Context.MODE_PRIVATE)
     }
 
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
+    }
+
     factory { Gson() }
 
     single<TrackSearchHistory> {
-        SharedPreferencesTrackSearchHistory(get())
+        SharedPreferencesTrackSearchHistory(get(), get())
     }
 
     single<NetworkClient> {
@@ -41,5 +48,9 @@ val dataModule = module {
 
     single<ExternalNavigator> {
         ExternalNavigatorImpl(androidContext())
+    }
+
+    single {
+        get<AppDatabase>().trackDao()
     }
 }

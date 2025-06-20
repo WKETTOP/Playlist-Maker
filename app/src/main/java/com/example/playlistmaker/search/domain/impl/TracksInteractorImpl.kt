@@ -27,11 +27,11 @@ class TracksInteractorImpl(
         }
     }
 
-    override fun getTrackSearchHistory(): List<Track> {
+    override suspend fun getTrackSearchHistory(): List<Track> {
         return trackSearchHistory.getTrackSearchHistory()
     }
 
-    override fun saveTrack(track: Track) {
+    override suspend fun saveTrack(track: Track) {
         trackSearchHistory.saveTrack(track)
     }
 

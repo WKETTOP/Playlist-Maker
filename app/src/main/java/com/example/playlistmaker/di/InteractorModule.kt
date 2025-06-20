@@ -1,5 +1,7 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.library.domain.dp.FavoriteTracksInteractor
+import com.example.playlistmaker.library.domain.impl.FavoriteTracksInteractorImpl
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
 import com.example.playlistmaker.player.domain.impl.TrackPlayerInteractorImpl
 import com.example.playlistmaker.search.domain.TracksInteractor
@@ -17,15 +19,19 @@ val interactorModule = module {
         TrackPlayerInteractorImpl(get())
     }
 
-    single<TracksInteractor> {
+    factory<TracksInteractor> {
         TracksInteractorImpl(get(), get())
     }
 
-    single<ThemeManager> {
+    factory<ThemeManager> {
         ThemeManagerImpl(get(), androidContext())
     }
 
-    single<SharingInteractor> {
+    factory<SharingInteractor> {
         SharingInteractorImpl(get())
+    }
+
+    factory<FavoriteTracksInteractor> {
+        FavoriteTracksInteractorImpl(get())
     }
 }

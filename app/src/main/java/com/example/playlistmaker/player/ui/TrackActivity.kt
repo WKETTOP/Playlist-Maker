@@ -15,7 +15,6 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityTrackBinding
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Transform
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -49,6 +48,10 @@ class TrackActivity : AppCompatActivity() {
             viewModel.togglePlayback()
         }
 
+        binding.favoriteButton.setOnClickListener {
+            viewModel.onFavoriteClick()
+        }
+
         Glide.with(this)
             .load(viewModel.track.getCoverArtWork())
             .placeholder(R.drawable.placeholder)
@@ -66,21 +69,28 @@ class TrackActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.playerViewState.collectLatest { state ->
-                    updatePlayerState(state.playerState)
+                launch {
+                    viewModel.playerViewState.collect { state ->
+                        updatePlayerState(state.playerState)
 
-                    when (state.playerState) {
-                        TrackViewModel.PlayerState.PLAYING, TrackViewModel.PlayerState.PAUSED -> {
-                            updateTrackPosition(state.currentPosition)
-                        }
-
-                        TrackViewModel.PlayerState.PREPARED -> {
-                            if (state.currentPosition == "00:00") {
+                        when (state.playerState) {
+                            TrackViewModel.PlayerState.PLAYING, TrackViewModel.PlayerState.PAUSED -> {
                                 updateTrackPosition(state.currentPosition)
                             }
-                        }
 
-                        TrackViewModel.PlayerState.LOADING -> {}
+                            TrackViewModel.PlayerState.PREPARED -> {
+                                if (state.currentPosition == "00:00") {
+                                    updateTrackPosition(state.currentPosition)
+                                }
+                            }
+
+                            TrackViewModel.PlayerState.LOADING -> {}
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isFavorite.collect { isFavorite ->
+                        updateFavoriteButton(isFavorite)
                     }
                 }
             }
@@ -120,6 +130,16 @@ class TrackActivity : AppCompatActivity() {
 
     private fun updateTrackPosition(position: String) {
         binding.trackTime.text = Transform.millisToMin(position)
+    }
+
+    private fun updateFavoriteButton(isFavorite: Boolean) {
+        val iconRes = if (isFavorite) {
+            R.drawable.ic_in_favorite_button_51
+        } else {
+            R.drawable.favorite_button_51
+        }
+
+        binding.favoriteButton.setImageResource(iconRes)
     }
 
     private fun getTrackFromIntent(): Track {

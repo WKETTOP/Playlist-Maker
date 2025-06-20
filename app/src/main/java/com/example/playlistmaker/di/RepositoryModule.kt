@@ -1,8 +1,11 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.library.data.FavoriteTracksRepositoryImpl
+import com.example.playlistmaker.library.data.converters.TrackDbConverter
+import com.example.playlistmaker.library.domain.dp.FavoriteTracksRepository
 import com.example.playlistmaker.player.data.impl.MediaPlayerManagerImpl
 import com.example.playlistmaker.player.domain.MediaPlayerManager
-import com.example.playlistmaker.search.data.network.TracksRepositoryImpl
+import com.example.playlistmaker.search.data.TracksRepositoryImpl
 import com.example.playlistmaker.search.domain.TracksRepository
 import com.example.playlistmaker.search.domain.impl.TrackMapperImpl
 import com.example.playlistmaker.search.domain.model.TrackMapper
@@ -21,11 +24,17 @@ val repositoryModule = module {
         MediaPlayerManagerImpl()
     }
 
-    single<TracksRepository> {
-        TracksRepositoryImpl(get(), get())
+    factory<TracksRepository> {
+        TracksRepositoryImpl(get(), get(), get())
     }
 
-    single<AppSettingsRepository> {
+    factory<AppSettingsRepository> {
         AppSettingsRepositoryImpl(androidContext())
     }
+
+    factory<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get(), get())
+    }
+
+    factory { TrackDbConverter() }
 }

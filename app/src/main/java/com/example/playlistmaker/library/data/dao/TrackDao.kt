@@ -16,6 +16,9 @@ interface TrackDao {
     @Delete(entity = TrackEntity::class)
     suspend fun deleteTrack(trackEntity: TrackEntity)
 
+    @Query("SELECT EXISTS(SELECT 1 FROM track_table WHERE trackId = :trackId LIMIT 1)")
+    suspend fun getTrackId(trackId: String): Boolean
+
     @Query("SELECT * FROM track_table ORDER BY rowid DESC")
     suspend fun getTracks(): List<TrackEntity>
 

@@ -52,8 +52,8 @@ class TrackViewModel(
 
         favoriteJob?.cancel()
         favoriteJob = viewModelScope.launch {
-            favoriteTracksInteractor.getFavoriteTracksId().collect { favoriteIds ->
-                _isFavorite.value = favoriteIds.contains(track.trackId)
+            favoriteTracksInteractor.getTrackId(track.trackId).collect { isFavorite ->
+                _isFavorite.value = isFavorite
             }
         }
     }

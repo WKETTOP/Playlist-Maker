@@ -17,11 +17,11 @@ class FavoriteTracksInteractorImpl(
         favoriteTracksRepository.deleteTrackFromFavorite(track)
     }
 
-    override fun getFavoriteTracks(): Flow<List<Track>> {
-        return favoriteTracksRepository.getFavoriteTracks()
+    override fun getTrackId(trackId: String): Flow<Boolean> {
+        return favoriteTracksRepository.getFavoriteTrackId(trackId)
     }
 
-    override fun getFavoriteTracksId(): Flow<List<String>> {
-        return favoriteTracksRepository.getFavoriteTracksId()
+    override fun getFavoriteTracks(): Flow<List<Track>> {
+        return favoriteTracksRepository.getFavoriteTracks()
     }
 }

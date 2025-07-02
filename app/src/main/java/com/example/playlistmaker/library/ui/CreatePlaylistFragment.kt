@@ -148,8 +148,7 @@ class CreatePlaylistFragment : Fragment() {
                             Toast.LENGTH_LONG
                         ).show()
                         viewModel.playlistCreateMessageShow()
-                        
-                        // Проверяем, работаем ли мы в Activity или Fragment navigation
+
                         if (activity is CreatePlaylistActivity) {
                             requireActivity().setResult(Activity.RESULT_OK)
                             requireActivity().finish()
@@ -206,7 +205,6 @@ class CreatePlaylistFragment : Fragment() {
         if (viewModel.hasUnsavedChanges()) {
             showExitConfirmationDialog()
         } else {
-            // Проверяем, работаем ли мы в Activity или Fragment navigation
             if (activity is CreatePlaylistActivity) {
                 requireActivity().finish()
             } else {
@@ -220,7 +218,6 @@ class CreatePlaylistFragment : Fragment() {
             .setTitle(getString(R.string.finish_creating_playlist_title_line))
             .setMessage(getString(R.string.unsaved_data_line))
             .setPositiveButton(getString(R.string.finish_line)) { _, _ ->
-                // Проверяем, работаем ли мы в Activity или Fragment navigation
                 if (activity is CreatePlaylistActivity) {
                     requireActivity().finish()
                 } else {

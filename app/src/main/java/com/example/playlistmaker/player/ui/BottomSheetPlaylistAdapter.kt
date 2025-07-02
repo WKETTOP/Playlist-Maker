@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.library.domain.model.Playlist
-import com.example.playlistmaker.library.ui.PlaylistViewHolder
 
 class BottomSheetPlaylistAdapter(private val onPlaylistClick: (Playlist) -> Unit) : RecyclerView.Adapter<BottomSheetPlaylistViewHolder>() {
 

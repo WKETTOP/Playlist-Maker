@@ -11,8 +11,8 @@
         android:id="@+id/new_playlist_button"
         style="@style/RoundedButtonStyle"
         android:layout_gravity="center_horizontal"
-        android:text="@string/new_playlist"
-        android:visibility="visible"
+        android:text="@string/new_playlist_line"
+        android:visibility="gone"
         app:cornerRadius="54dp" />
 
     <ImageView
@@ -21,14 +21,21 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="106dp"
-        android:visibility="visible"
+        android:visibility="gone"
         tools:src="@drawable/nothing_found_120" />
 
     <TextView
         android:id="@+id/error_text"
         style="@style/ErrorTextStyle"
-        android:layout_marginTop="242dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="242dp"
+        android:visibility="gone"
         tools:text="@string/playlists_empty_line" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlist_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="76dp"/>
 
 </FrameLayout>

@@ -15,7 +15,7 @@ class FavoriteTracksViewModel(
     private val favoriteTracksInteractor: FavoriteTracksInteractor
 ) : ViewModel() {
 
-    private val _favoriteTracksViewState =
+    private var _favoriteTracksViewState =
         MutableStateFlow<FavoriteTracksViewState>(FavoriteTracksViewState.Empty)
     val favoriteTracksViewState: StateFlow<FavoriteTracksViewState> =
         _favoriteTracksViewState.asStateFlow()

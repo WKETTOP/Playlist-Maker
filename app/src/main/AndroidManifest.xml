@@ -20,6 +20,9 @@
             android:name=".player.ui.TrackActivity"
             android:exported="false" />
         <activity
+            android:name=".library.ui.CreatePlaylistActivity"
+            android:exported="false" />
+        <activity
             android:name=".root.ui.RootActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">

@@ -1,20 +1,29 @@
 package com.example.playlistmaker.player.ui
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityTrackBinding
+import com.example.playlistmaker.library.ui.CreatePlaylistActivity
+import com.example.playlistmaker.player.ui.model.AddTrackResult
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Transform
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -26,6 +35,17 @@ class TrackActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityTrackBinding
+    private lateinit var playlistAdapter: BottomSheetPlaylistAdapter
+
+    private val createPlaylistLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            viewModel.loadPlaylists()
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
 
     private val viewModel by viewModel<TrackViewModel> { parametersOf(getTrackFromIntent()) }
 
@@ -44,12 +64,62 @@ class TrackActivity : AppCompatActivity() {
             finish()
         }
 
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            val screenHeight = resources.displayMetrics.heightPixels
+            peekHeight = (screenHeight * 0.6).toInt()
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.isVisible = false
+                    else -> binding.overlay.isVisible = true
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                val alpha = when {
+                   slideOffset < 0f -> {
+                       (slideOffset + 1f) * 0.6f
+                   }
+                   else -> 0.6f + slideOffset * 0.4f
+                }
+                binding.overlay.alpha = alpha
+            }
+        })
+
+        playlistAdapter = BottomSheetPlaylistAdapter { playlist ->
+            viewModel.addTrackToPlaylist(playlist)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding.overlay.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding.availablePlaylistsRecyclerView.layoutManager =
+            LinearLayoutManager(this@TrackActivity)
+        binding.availablePlaylistsRecyclerView.adapter = playlistAdapter
+
         binding.playButton.setOnClickListener {
             viewModel.togglePlayback()
         }
 
         binding.favoriteButton.setOnClickListener {
             viewModel.onFavoriteClick()
+        }
+
+        binding.addButton.setOnClickListener {
+            viewModel.loadPlaylists()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        binding.newPlaylistButton.setOnClickListener {
+            val intent = Intent(this, CreatePlaylistActivity::class.java)
+            createPlaylistLauncher.launch(intent)
         }
 
         Glide.with(this)
@@ -91,6 +161,19 @@ class TrackActivity : AppCompatActivity() {
                 launch {
                     viewModel.isFavorite.collect { isFavorite ->
                         updateFavoriteButton(isFavorite)
+                    }
+                }
+                launch {
+                    viewModel.playlists.collect { playlists ->
+                        playlistAdapter.updateData(playlists)
+                    }
+                }
+                launch {
+                    viewModel.addTrackResult.collect { result ->
+                        result?.let {
+                            showAddTrackToast(it)
+                            viewModel.clearAddTrackResult()
+                        }
                     }
                 }
             }
@@ -149,5 +232,21 @@ class TrackActivity : AppCompatActivity() {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra(TRACK_READ)!!
         }
+    }
+
+    private fun showAddTrackToast(result: AddTrackResult) {
+        val message = when (result) {
+            is AddTrackResult.Success -> getString(
+                R.string.added_to_playlist_line,
+                result.playlistTitle
+            )
+
+            is AddTrackResult.AlreadyExists -> getString(
+                R.string.already_in_playlist_line,
+                result.playlistTitle
+            )
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }

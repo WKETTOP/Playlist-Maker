@@ -27,7 +27,24 @@
     <string name="country_line">Country</string>
     <string name="favorite_tracks_empty_line">Your library is empty</string>
     <string name="playlists_empty_line">You haven\'t created any playlists</string>
-    <string name="new_playlist">New playlist</string>
+    <string name="new_playlist_line">New playlist</string>
     <string name="favorite_track_line">Favorite tracks</string>
     <string name="playlists_line">Playlists</string>
+    <string name="new_playlist_title_line">Title*</string>
+    <string name="new_playlist_description_line">Description</string>
+    <string name="new_playlist_create_line">Create</string>
+    <string name="playlist_created_message_line">Playlist %s created</string>
+    <string name="finish_creating_playlist_title_line">Complete playlist creation?</string>
+    <string name="unsaved_data_line">All unsaved data will be lost</string>
+    <string name="finish_line">Complete</string>
+    <string name="cancel_line"> Cancel</string>
+    <plurals name="track_count">
+        <item quantity="one">%d track</item>
+        <item quantity="few">%d tracks</item>
+        <item quantity="many">%d tracks</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
+    <string name="add_to_playlist_line">Add to playlist</string>
+    <string name="added_to_playlist_line">Added to playlist %s</string>
+    <string name="already_in_playlist_line">Track already in playlist %s</string>
 </resources>

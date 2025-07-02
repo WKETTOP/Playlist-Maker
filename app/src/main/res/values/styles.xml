@@ -70,4 +70,19 @@
         <item name="android:textFontWeight">500</item>
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="AddNewPlaylistEditStyle">
+        <item name="android:background">@drawable/add_new_playlist_edit_border</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:importantForAutofill">no</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/size_16</item>
+        <item name="android:inputType">text</item>
+        <item name="android:maxLength">100</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">@dimen/padding_16</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/black_night</item>
+    </style>
 </resources>

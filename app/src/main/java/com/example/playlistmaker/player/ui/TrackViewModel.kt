@@ -3,7 +3,10 @@ package com.example.playlistmaker.player.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.library.domain.dp.FavoriteTracksInteractor
+import com.example.playlistmaker.library.domain.dp.PlaylistInteractor
+import com.example.playlistmaker.library.domain.model.Playlist
 import com.example.playlistmaker.player.domain.TrackPlayerInteractor
+import com.example.playlistmaker.player.ui.model.AddTrackResult
 import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.search.domain.model.Track
 import kotlinx.coroutines.Job
@@ -15,9 +18,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class TrackViewModel(
-    private val trackPlayerInteractor: TrackPlayerInteractor,
     private val _track: Track,
-    private val favoriteTracksInteractor: FavoriteTracksInteractor
+    private val trackPlayerInteractor: TrackPlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     enum class PlayerState {
@@ -35,10 +39,16 @@ class TrackViewModel(
         get() = _track
 
     private val _playerViewState = MutableStateFlow(PlayerViewState())
-    val playerViewState: StateFlow<PlayerViewState> = _playerViewState.asStateFlow()
+    val playerViewState: StateFlow<PlayerViewState> = _playerViewState
 
     private val _isFavorite = MutableStateFlow(false)
-    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+    val isFavorite: StateFlow<Boolean> = _isFavorite
+
+    private val _playlists = MutableStateFlow<List<Playlist>>(emptyList())
+    val playlists: StateFlow<List<Playlist>> = _playlists
+
+    private val _addTrackResult = MutableStateFlow<AddTrackResult?>(null)
+    val addTrackResult: StateFlow<AddTrackResult?> = _addTrackResult
 
     private var updateJob: Job? = null
     private var favoriteJob: Job? = null
@@ -78,6 +88,30 @@ class TrackViewModel(
 
             _isFavorite.value = !isCurrentFavorite
         }
+    }
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.getAllPlaylists().collect { playlists ->
+                _playlists.value = playlists
+            }
+        }
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        viewModelScope.launch {
+            val success = playlistInteractor.addTrackToPlaylist(_track, playlist)
+
+            _addTrackResult.value = if (success) {
+                AddTrackResult.Success(playlist.title)
+            } else {
+                AddTrackResult.AlreadyExists(playlist.title)
+            }
+        }
+    }
+
+    fun clearAddTrackResult() {
+        _addTrackResult.value = null
     }
 
     private fun preparePlayer() {

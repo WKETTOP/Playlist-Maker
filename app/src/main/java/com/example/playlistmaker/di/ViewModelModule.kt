@@ -7,7 +7,7 @@ import com.example.playlistmaker.player.ui.TrackViewModel
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.ui.SearchTrackViewModel
 import com.example.playlistmaker.settings.ui.SettingsViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {

@@ -31,19 +31,27 @@ class CreatePlaylistViewModel(
         _screenState.value = _screenState.value.copy(playlistDescription = description)
     }
 
-    fun updateCoverImage(imageUri: Uri?) {
-        _screenState.value = _screenState.value.copy(coverImageUri = imageUri)
+    fun saveCoverImage(uri: Uri) {
+        viewModelScope.launch {
+            val savedImagePath = playlistInteractor.savePlaylistCover(uri)
+            if (savedImagePath != null) {
+                updateCoverImage(savedImagePath)
+            }
+        }
     }
 
-    fun createPlaylist(savedImagePath: String?) {
+    private fun updateCoverImage(path: String) {
+        _screenState.value = _screenState.value.copy(coverImageUri = path)
+    }
+
+    fun createPlaylist() {
         viewModelScope.launch {
             val state = _screenState.value
             if (state.playlistTitle.isNotBlank()) {
                 val playlist = Playlist(
                     title = state.playlistTitle,
                     description = state.playlistDescription,
-                    coverImagePath = savedImagePath.orEmpty(),
-                    trackIds = emptyList(),
+                    coverImagePath = state.coverImageUri.orEmpty(),
                     trackCount = 0
                 )
                 playlistInteractor.createPlaylist(playlist)

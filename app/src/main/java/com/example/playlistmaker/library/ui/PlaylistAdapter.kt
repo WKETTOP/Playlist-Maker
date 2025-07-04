@@ -5,14 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.library.domain.model.Playlist
+import com.example.playlistmaker.library.ui.model.PlaylistUiModel
 
-class PlaylistAdapter(private val onClick: (Playlist) -> Unit) :
+class PlaylistAdapter(private val onClick: (PlaylistUiModel) -> Unit) :
     RecyclerView.Adapter<PlaylistViewHolder>() {
 
-    private var playlists = mutableListOf<Playlist>()
+    private var playlists = mutableListOf<PlaylistUiModel>()
 
-    fun updateData(newItems: List<Playlist>) {
+    fun updateData(newItems: List<PlaylistUiModel>) {
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
 
             override fun getOldListSize(): Int = playlists.size

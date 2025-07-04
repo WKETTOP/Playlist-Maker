@@ -7,9 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.library.domain.model.Playlist
+import com.example.playlistmaker.library.ui.model.PlaylistUiModel
 import com.example.playlistmaker.util.Transform
-import java.io.File
 
 class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -17,24 +16,15 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val playlistTitle: TextView = itemView.findViewById(R.id.playlist_title)
     private val playlistTracksCount: TextView = itemView.findViewById(R.id.playlist_tracks_count)
 
-    fun bind(playlist: Playlist, onClick: (Playlist) -> Unit) {
+    fun bind(playlist: PlaylistUiModel, onClick: (PlaylistUiModel) -> Unit) {
         val cornerRadius = Transform.dpToPx(8f, itemView.context)
 
-        if (playlist.coverImagePath.isNotEmpty()) {
-            val file = File(playlist.coverImagePath)
-            if (file.exists()) {
-                Glide.with(itemView)
-                    .load(file)
-                    .placeholder(R.drawable.placeholder)
-                    .centerCrop()
-                    .transform(RoundedCorners(cornerRadius))
-                    .into(playlistCover)
-            } else {
-                playlistCover.setImageResource(R.drawable.placeholder)
-            }
-        } else {
-            playlistCover.setImageResource(R.drawable.placeholder)
-        }
+        Glide.with(itemView)
+            .load(playlist.coverUri)
+            .placeholder(R.drawable.placeholder)
+            .centerCrop()
+            .transform(RoundedCorners(cornerRadius))
+            .into(playlistCover)
 
         playlistTitle.text = playlist.title
 

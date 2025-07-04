@@ -1,10 +1,10 @@
 package com.example.playlistmaker.library.data.converters
 
 import com.example.playlistmaker.library.data.db.PlaylistEntity
+import com.example.playlistmaker.library.data.db.PlaylistWithTracks
 import com.example.playlistmaker.library.domain.model.Playlist
-import com.google.gson.Gson
 
-class PlaylistDbConverter(private val gson: Gson) {
+class PlaylistDbConverter {
 
     fun map(playlist: Playlist): PlaylistEntity {
         return PlaylistEntity(
@@ -12,24 +12,29 @@ class PlaylistDbConverter(private val gson: Gson) {
             title = playlist.title,
             description = playlist.description,
             coverImagePath = playlist.coverImagePath,
-            trackIds = gson.toJson(playlist.trackIds),
-            trackCount = playlist.trackCount,
+            createdAt = playlist.createdAt
         )
     }
 
     fun map(playlistEntity: PlaylistEntity): Playlist {
-        val trackIds = if (playlistEntity.trackIds.isNotEmpty()) {
-            gson.fromJson(playlistEntity.trackIds, Array<String>::class.java).toList()
-        } else {
-            emptyList()
-        }
         return Playlist(
             playlistId = playlistEntity.playlistId,
             title = playlistEntity.title,
             description = playlistEntity.description,
             coverImagePath = playlistEntity.coverImagePath,
-            trackIds = trackIds,
-            trackCount = playlistEntity.trackCount
+            createdAt = playlistEntity.createdAt,
+            trackCount = 0
+        )
+    }
+
+    fun map(playlistWithTracks: PlaylistWithTracks): Playlist {
+        return Playlist(
+            playlistId = playlistWithTracks.playlistEntity.playlistId,
+            title = playlistWithTracks.playlistEntity.title,
+            description = playlistWithTracks.playlistEntity.description,
+            coverImagePath = playlistWithTracks.playlistEntity.coverImagePath,
+            trackCount = playlistWithTracks.tracks.size,
+            createdAt = playlistWithTracks.playlistEntity.createdAt
         )
     }
 }

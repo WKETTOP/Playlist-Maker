@@ -3,9 +3,10 @@ package com.example.playlistmaker.library.data.db
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("""
+object DataBaseMigrations {
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
             CREATE TABLE IF NOT EXISTS 'playlist_table' (
                 playlistId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 title TEXT NOT NULL,
@@ -15,12 +16,12 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 trackCount INTEGER NOT NULL
             )
         """.trimIndent())
+        }
     }
-}
 
-val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("""
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
             CREATE TABLE IF NOT EXISTS 'playlist_tracks_table' (
                 trackId TEXT NOT NULL PRIMARY KEY,
                 trackName TEXT NOT NULL,
@@ -34,5 +35,6 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 previewUrl TEXT NOT NULL
             )
         """.trimIndent())
+        }
     }
 }

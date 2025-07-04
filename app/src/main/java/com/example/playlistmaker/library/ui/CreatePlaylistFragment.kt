@@ -1,10 +1,7 @@
 package com.example.playlistmaker.library.ui
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -16,16 +13,15 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import android.app.Activity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
-import java.io.FileOutputStream
 
 class CreatePlaylistFragment : Fragment() {
 
@@ -36,7 +32,6 @@ class CreatePlaylistFragment : Fragment() {
 
     private var titleTextWatcher: TextWatcher? = null
     private var descriptionTextWatcher: TextWatcher? = null
-    private var savedImagePath: String? = null
 
     private val pickVisualMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -46,8 +41,7 @@ class CreatePlaylistFragment : Fragment() {
                 binding.playlistCoverImage.isVisible = true
                 binding.addPhotoIcon.isVisible = false
                 binding.playlistCoverImage.setImageURI(uri)
-                savedImagePath = saveImageToPrivateStorage(uri)
-                viewModel.updateCoverImage(uri)
+                viewModel.saveCoverImage(uri)
             }
         } ?: run {
             binding.playlistCoverImage.isVisible = false
@@ -130,29 +124,30 @@ class CreatePlaylistFragment : Fragment() {
         }
 
         binding.createNewPlaylistButton.setOnClickListener {
-            viewModel.createPlaylist(savedImagePath)
+            viewModel.createPlaylist()
         }
 
-        lifecycleScope.launch {
-            launch {
-                viewModel.screenState.collect { state ->
-                    binding.createNewPlaylistButton.isEnabled = state.isCreateButtonEnabled
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.screenState.collect { state ->
+                        binding.createNewPlaylistButton.isEnabled = state.isCreateButtonEnabled
+                    }
                 }
-            }
-            launch {
-                viewModel.playlistCreated.collect { playlistTitle ->
-                    playlistTitle?.let {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.playlist_created_message_line, it),
-                            Toast.LENGTH_LONG
-                        ).show()
-                        viewModel.playlistCreateMessageShow()
+                launch {
+                    viewModel.playlistCreated.collect { playlistTitle ->
+                        playlistTitle?.let {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.playlist_created_message_line, it),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            viewModel.playlistCreateMessageShow()
 
-                        if (activity is CreatePlaylistActivity) {
-                            requireActivity().setResult(Activity.RESULT_OK)
-                            requireActivity().finish()
-                        } else {
+                            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                                "playlist_created",
+                                true
+                            )
                             findNavController().navigateUp()
                         }
                     }
@@ -179,37 +174,11 @@ class CreatePlaylistFragment : Fragment() {
         _binding = null
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri): String? {
-        return try {
-            val filePath = File(
-                requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                "playlistmaker"
-            )
-            if (!filePath.exists()) {
-                filePath.mkdir()
-            }
-
-            val file = File(filePath, "cover.jpg")
-            val inputStream = requireActivity().contentResolver.openInputStream(uri)
-            val outputStream = FileOutputStream(file)
-            BitmapFactory
-                .decodeStream(inputStream)
-                .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
-            file.absolutePath
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     private fun handleBackPressed() {
         if (viewModel.hasUnsavedChanges()) {
             showExitConfirmationDialog()
         } else {
-            if (activity is CreatePlaylistActivity) {
-                requireActivity().finish()
-            } else {
-                findNavController().navigateUp()
-            }
+            findNavController().navigateUp()
         }
     }
 
@@ -218,11 +187,7 @@ class CreatePlaylistFragment : Fragment() {
             .setTitle(getString(R.string.finish_creating_playlist_title_line))
             .setMessage(getString(R.string.unsaved_data_line))
             .setPositiveButton(getString(R.string.finish_line)) { _, _ ->
-                if (activity is CreatePlaylistActivity) {
-                    requireActivity().finish()
-                } else {
-                    findNavController().navigateUp()
-                }
+                findNavController().navigateUp()
             }
             .setNeutralButton(getString(R.string.cancel_line)) { dialog, _ ->
                 dialog.dismiss()

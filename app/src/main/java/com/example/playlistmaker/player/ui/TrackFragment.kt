@@ -1,25 +1,22 @@
 package com.example.playlistmaker.player.ui
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityTrackBinding
-import com.example.playlistmaker.library.ui.CreatePlaylistActivity
+import com.example.playlistmaker.databinding.FragmentTrackBinding
 import com.example.playlistmaker.player.ui.model.AddTrackResult
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Transform
@@ -28,42 +25,30 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class TrackActivity : AppCompatActivity() {
+class TrackFragment : Fragment() {
 
-    companion object {
-        const val TRACK_READ = "TRACK"
-    }
+    private var _binding: FragmentTrackBinding? = null
+    private val binding get() = _binding!!
 
-    private lateinit var binding: ActivityTrackBinding
     private lateinit var playlistAdapter: BottomSheetPlaylistAdapter
 
-    private val createPlaylistLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            viewModel.loadPlaylists()
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
+    private val viewModel by viewModel<TrackViewModel> { parametersOf(getTrackFromArguments()) }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTrackBinding.inflate(inflater, container,false)
+        return binding.root
     }
 
-    private val viewModel by viewModel<TrackViewModel> { parametersOf(getTrackFromIntent()) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityTrackBinding.inflate(layoutInflater)
-        enableEdgeToEdge()
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.backButton.setNavigationOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
-
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -82,10 +67,10 @@ class TrackActivity : AppCompatActivity() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 val alpha = when {
-                   slideOffset < 0f -> {
-                       (slideOffset + 1f) * 0.6f
-                   }
-                   else -> 0.6f + slideOffset * 0.4f
+                    slideOffset < 0f -> {
+                        (slideOffset + 1f) * 0.6f
+                    }
+                    else -> 0.6f + slideOffset * 0.4f
                 }
                 binding.overlay.alpha = alpha
             }
@@ -101,7 +86,7 @@ class TrackActivity : AppCompatActivity() {
         }
 
         binding.availablePlaylistsRecyclerView.layoutManager =
-            LinearLayoutManager(this@TrackActivity)
+            LinearLayoutManager(requireContext())
         binding.availablePlaylistsRecyclerView.adapter = playlistAdapter
 
         binding.playButton.setOnClickListener {
@@ -118,15 +103,14 @@ class TrackActivity : AppCompatActivity() {
         }
 
         binding.newPlaylistButton.setOnClickListener {
-            val intent = Intent(this, CreatePlaylistActivity::class.java)
-            createPlaylistLauncher.launch(intent)
+            findNavController().navigate(R.id.action_trackFragment_to_createPlaylistFragment)
         }
 
         Glide.with(this)
             .load(viewModel.track.getCoverArtWork())
             .placeholder(R.drawable.placeholder)
             .centerCrop()
-            .transform(RoundedCorners(Transform.dpToPx(8f, this)))
+            .transform(RoundedCorners(Transform.dpToPx(8f, requireContext())))
             .into(binding.artWork)
         binding.trackName.text = viewModel.track.trackName
         binding.artistName.text = viewModel.track.artistName
@@ -137,7 +121,17 @@ class TrackActivity : AppCompatActivity() {
         binding.genreValue.text = viewModel.track.primaryGenreName
         binding.countryValue.text = viewModel.track.country
 
-        lifecycleScope.launch {
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("playlist_created")
+            ?.observe(viewLifecycleOwner) { created ->
+                if (created == true) {
+                    viewModel.loadPlaylists()
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+                    findNavController().currentBackStackEntry?.savedStateHandle?.set("playlist_created", false)
+                }
+            }
+
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.playerViewState.collect { state ->
@@ -187,6 +181,24 @@ class TrackActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            binding.overlay.isVisible = true
+            binding.overlay.alpha = 0.6f
+        }
+    }
+
+    private fun getTrackFromArguments(): Track {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(TRACK_READ, Track::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable(TRACK_READ)!!
+        }
+    }
+
     private fun updatePlayerState(state: TrackViewModel.PlayerState) {
         when (state) {
             TrackViewModel.PlayerState.LOADING -> {
@@ -225,15 +237,6 @@ class TrackActivity : AppCompatActivity() {
         binding.favoriteButton.setImageResource(iconRes)
     }
 
-    private fun getTrackFromIntent(): Track {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(TRACK_READ, Track::class.java)!!
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(TRACK_READ)!!
-        }
-    }
-
     private fun showAddTrackToast(result: AddTrackResult) {
         val message = when (result) {
             is AddTrackResult.Success -> getString(
@@ -247,6 +250,15 @@ class TrackActivity : AppCompatActivity() {
             )
         }
 
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        const val TRACK_READ = "TRACK"
     }
 }

@@ -40,12 +40,20 @@ val repositoryModule = module {
     }
 
     factory<PlaylistRepository> {
-        PlaylistRepositoryImpl(get(), get(), get(), get())
+        PlaylistRepositoryImpl(
+            get(),
+            get(),
+            get(),
+            get(),
+            androidContext()
+        )
     }
 
-    factory { TrackDbConverter() }
+    factory {
+        TrackDbConverter()
+    }
 
     factory {
-        PlaylistDbConverter(get())
+        PlaylistDbConverter()
     }
 }

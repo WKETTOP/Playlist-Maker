@@ -6,21 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
-import com.example.playlistmaker.library.domain.model.Playlist
+import com.example.playlistmaker.library.ui.model.PlaylistUiModel
 import com.example.playlistmaker.library.ui.model.PlaylistViewState
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
-
-    companion object {
-        fun createArgs() = PlaylistsFragment()
-    }
 
     private val viewModel by viewModel<PlaylistsViewModel>()
 
@@ -54,11 +52,13 @@ class PlaylistsFragment : Fragment() {
             )
         }
 
-        lifecycleScope.launch {
-            viewModel.playlistViewState.collect { state ->
-                when(state) {
-                    is PlaylistViewState.Empty -> showEmpty()
-                    is PlaylistViewState.Content -> showContent(state.playlists)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playlistViewState.collect { state ->
+                    when (state) {
+                        is PlaylistViewState.Empty -> showEmpty()
+                        is PlaylistViewState.Content -> showContent(state.playlists)
+                    }
                 }
             }
         }
@@ -84,12 +84,16 @@ class PlaylistsFragment : Fragment() {
         binding.errorText.setText(R.string.playlists_empty_line)
     }
 
-    private fun showContent(playlists: List<Playlist>) {
+    private fun showContent(playlists: List<PlaylistUiModel>) {
         binding.playlistRecyclerView.isVisible = true
         binding.errorImage.isVisible = false
         binding.errorText.isVisible = false
         binding.newPlaylistButton.isVisible = true
 
         playlistAdapter.updateData(playlists)
+    }
+
+    companion object {
+        fun createArgs() = PlaylistsFragment()
     }
 }

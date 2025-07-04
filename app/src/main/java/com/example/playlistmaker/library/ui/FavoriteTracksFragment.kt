@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
@@ -18,10 +20,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoriteTracksFragment : Fragment() {
-
-    companion object {
-        fun createArgs() = FavoriteTracksFragment()
-    }
 
     private val viewModel by viewModel<FavoriteTracksViewModel>()
 
@@ -50,9 +48,11 @@ class FavoriteTracksFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.favoriteTracks.adapter = trackAdapter
 
-        lifecycleScope.launch {
-            viewModel.favoriteTracksViewState.collect { state ->
-                renderState(state)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favoriteTracksViewState.collect { state ->
+                    renderState(state)
+                }
             }
         }
     }
@@ -68,7 +68,7 @@ class FavoriteTracksFragment : Fragment() {
         }
 
         findNavController().navigate(
-            R.id.action_mediaLibraryFragment_to_trackActivity,
+            R.id.action_mediaLibraryFragment_to_trackFragment,
             args
         )
     }
@@ -103,5 +103,9 @@ class FavoriteTracksFragment : Fragment() {
         super.onDestroyView()
         binding.favoriteTracks.adapter = null
         _binding = null
+    }
+
+    companion object {
+        fun createArgs() = FavoriteTracksFragment()
     }
 }

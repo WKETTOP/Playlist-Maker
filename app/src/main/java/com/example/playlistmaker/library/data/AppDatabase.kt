@@ -3,15 +3,14 @@ package com.example.playlistmaker.library.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.playlistmaker.library.data.dao.PlaylistDao
-import com.example.playlistmaker.library.data.dao.PlaylistTrackDao
 import com.example.playlistmaker.library.data.dao.TrackDao
 import com.example.playlistmaker.library.data.db.PlaylistEntity
-import com.example.playlistmaker.library.data.db.PlaylistTrackEntity
+import com.example.playlistmaker.library.data.db.PlaylistTrackCrossRef
 import com.example.playlistmaker.library.data.db.TrackEntity
 
 @Database(
-    version = 3,
-    entities = [TrackEntity::class, PlaylistEntity::class, PlaylistTrackEntity::class],
+    version = 4,
+    entities = [TrackEntity::class, PlaylistEntity::class, PlaylistTrackCrossRef::class],
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -20,5 +19,4 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun playlistDao(): PlaylistDao
 
-    abstract fun playlistTrackDao(): PlaylistTrackDao
 }

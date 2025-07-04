@@ -1,5 +1,6 @@
 package com.example.playlistmaker.library.domain.impl
 
+import android.net.Uri
 import com.example.playlistmaker.library.domain.dp.PlaylistInteractor
 import com.example.playlistmaker.library.domain.dp.PlaylistRepository
 import com.example.playlistmaker.library.domain.model.Playlist
@@ -14,16 +15,8 @@ class PlaylistInteractorImpl(
         playlistRepository.createPlaylist(playlist)
     }
 
-    override suspend fun updatePlaylist(playlist: Playlist) {
-        playlistRepository.updatePlaylist(playlist)
-    }
-
-    override suspend fun deletePlaylist(playlistId: Int) {
-        playlistRepository.deletePlaylist(playlistId)
-    }
-
-    override suspend fun getPlaylistById(playlistId: Int): Playlist? {
-        return playlistRepository.getPlaylistById(playlistId)
+    override fun getAllPlaylists(): Flow<List<Playlist>> {
+        return playlistRepository.getAllPlaylists()
     }
 
     override suspend fun addTrackToPlaylist(
@@ -33,7 +26,26 @@ class PlaylistInteractorImpl(
         return playlistRepository.addTrackToPlaylist(track, playlist)
     }
 
-    override fun getAllPlaylists(): Flow<List<Playlist>> {
-       return playlistRepository.getAllPlaylists()
+    override suspend fun removeTrackFromPlaylist(
+        track: Track,
+        playlist: Playlist
+    ) {
+        return playlistRepository.removeTrackFromPlaylist(track.trackId, playlist.playlistId)
+    }
+
+    override suspend fun getTracksFromPlaylist(playlist: Playlist): List<Track> {
+        return playlistRepository.getTracksFromPlaylist(playlist.playlistId)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        return playlistRepository.deletePlaylist(playlist)
+    }
+
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        return playlistRepository.updatePlaylist(playlist)
+    }
+
+    override suspend fun savePlaylistCover(uri: Uri): String? {
+         return playlistRepository.savePlaylistCover(uri)
     }
 }

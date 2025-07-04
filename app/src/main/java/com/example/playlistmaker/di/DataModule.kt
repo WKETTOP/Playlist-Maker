@@ -3,8 +3,6 @@ package com.example.playlistmaker.di
 import android.content.Context
 import androidx.room.Room
 import com.example.playlistmaker.library.data.AppDatabase
-import com.example.playlistmaker.library.data.db.MIGRATION_1_2
-import com.example.playlistmaker.library.data.db.MIGRATION_2_3
 import com.example.playlistmaker.search.data.dto.SharedPreferencesTrackSearchHistory
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -35,7 +33,7 @@ val dataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
 
@@ -59,9 +57,5 @@ val dataModule = module {
 
     single {
         get<AppDatabase>().playlistDao()
-    }
-
-    single {
-        get<AppDatabase>().playlistTrackDao()
     }
 }

@@ -82,7 +82,7 @@
         <item name="android:maxLines">1</item>
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/black_night</item>
         <item name="android:textColorHint">@color/black_night</item>
     </style>
 </resources>

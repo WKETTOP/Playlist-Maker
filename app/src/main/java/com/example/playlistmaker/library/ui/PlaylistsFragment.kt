@@ -6,17 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.example.playlistmaker.library.ui.model.PlaylistUiModel
+import com.example.playlistmaker.library.ui.model.PlaylistViewState
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
 
+    private val viewModel by viewModel<PlaylistsViewModel>()
+
+    private lateinit var playlistAdapter: PlaylistAdapter
+
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
-
-    companion object {
-        fun createArgs() = PlaylistsFragment()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,13 +38,62 @@ class PlaylistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.newPlaylistButton.isVisible = true
-        binding.errorImage.setImageResource(R.drawable.nothing_found_120)
-        binding.errorText.setText(R.string.playlists_empty_line)
+
+        playlistAdapter = PlaylistAdapter { playlist ->
+
+        }
+
+        binding.playlistRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.playlistRecyclerView.adapter = playlistAdapter
+
+        binding.newPlaylistButton.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_mediaLibraryFragment_to_createPlaylistFragment,
+            )
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playlistViewState.collect { state ->
+                    when (state) {
+                        is PlaylistViewState.Empty -> showEmpty()
+                        is PlaylistViewState.Content -> showContent(state.playlists)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fillData()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showEmpty() {
+        binding.playlistRecyclerView.isVisible = false
+        binding.errorImage.isVisible = true
+        binding.errorText.isVisible = true
+        binding.newPlaylistButton.isVisible = true
+
+        binding.errorImage.setImageResource(R.drawable.nothing_found_120)
+        binding.errorText.setText(R.string.playlists_empty_line)
+    }
+
+    private fun showContent(playlists: List<PlaylistUiModel>) {
+        binding.playlistRecyclerView.isVisible = true
+        binding.errorImage.isVisible = false
+        binding.errorText.isVisible = false
+        binding.newPlaylistButton.isVisible = true
+
+        playlistAdapter.updateData(playlists)
+    }
+
+    companion object {
+        fun createArgs() = PlaylistsFragment()
     }
 }

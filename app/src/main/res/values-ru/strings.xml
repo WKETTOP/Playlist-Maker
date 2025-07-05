@@ -24,7 +24,24 @@
     <string name="country_line">Страна</string>
     <string name="favorite_tracks_empty_line">Ваша медиатека пуста</string>
     <string name="playlists_empty_line">Вы не создали\n ни одного плейлиста</string>
-    <string name="new_playlist">Новый плейлист</string>
+    <string name="new_playlist_line">Новый плейлист</string>
     <string name="favorite_track_line">Избранные треки</string>
     <string name="playlists_line">Плейлисты</string>
+    <string name="new_playlist_title_line">Название*</string>
+    <string name="new_playlist_description_line">Описание</string>
+    <string name="new_playlist_create_line">Создать</string>
+    <string name="playlist_created_message_line">Плейлист %s создан</string>
+    <string name="finish_creating_playlist_title_line">Завершить создание плейлиста?</string>
+    <string name="unsaved_data_line">Все несохраненные данные будут потеряны</string>
+    <string name="finish_line">Завершить</string>
+    <string name="cancel_line">Отмена</string>
+    <plurals name="track_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d треков</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
+    <string name="add_to_playlist_line">Добавить в плейлист</string>
+    <string name="added_to_playlist_line">Добавлено в плейлист %s</string>
+    <string name="already_in_playlist_line">Трек уже добавлен в плейлист %s</string>
 </resources>

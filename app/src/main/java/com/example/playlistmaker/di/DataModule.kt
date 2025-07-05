@@ -33,6 +33,7 @@ val dataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
 
@@ -52,5 +53,9 @@ val dataModule = module {
 
     single {
         get<AppDatabase>().trackDao()
+    }
+
+    single {
+        get<AppDatabase>().playlistDao()
     }
 }

@@ -1,6 +1,5 @@
 package com.example.playlistmaker.search.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,15 +10,16 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
-import com.example.playlistmaker.player.ui.TrackActivity
 import com.example.playlistmaker.search.ui.model.SearchState
 import com.example.playlistmaker.search.ui.model.SearchViewState
 import kotlinx.coroutines.flow.collectLatest
@@ -27,10 +27,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
-
-    companion object {
-        const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
-    }
 
     private val viewModel by viewModel<SearchTrackViewModel>()
 
@@ -188,10 +184,9 @@ class SearchFragment : Fragment() {
     }
 
     private fun handlerEvents(events: SearchViewState.UiEvents) {
-        events.navigateToTrack?.let {
-            startActivity(Intent(requireContext(), TrackActivity::class.java).apply {
-                putExtra("TRACK", it)
-            })
+        events.navigateToTrack?.let { track ->
+            val bundle = bundleOf("TRACK" to track)
+            findNavController().navigate(R.id.action_searchFragment_to_trackFragment, bundle)
             viewModel.clearEvents()
         }
 
@@ -218,5 +213,9 @@ class SearchFragment : Fragment() {
             binding.trackInput.removeTextChangedListener(it)
         }
         _binding = null
+    }
+
+    companion object {
+        const val KEY_INPUT_TEXT = "KEY_INPUT_TEXT"
     }
 }

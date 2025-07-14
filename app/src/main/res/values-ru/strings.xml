@@ -37,11 +37,28 @@
     <string name="cancel_line">Отмена</string>
     <plurals name="track_count">
         <item quantity="one">%d трек</item>
-        <item quantity="few">%d треков</item>
+        <item quantity="few">%d трека</item>
         <item quantity="many">%d треков</item>
         <item quantity="other">%d треков</item>
     </plurals>
     <string name="add_to_playlist_line">Добавить в плейлист</string>
     <string name="added_to_playlist_line">Добавлено в плейлист %s</string>
     <string name="already_in_playlist_line">Трек уже добавлен в плейлист %s</string>
+    <plurals name="duration_minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
+    <string name="less_minute">меньше минуты</string>
+    <string name="delete_track_line">Хотите удалить трек?</string>
+    <string name="yes_line">Да</string>
+    <string name="no_line">Нет</string>
+    <string name="share_line">Поделиться</string>
+    <string name="edit_information_line">Редактировать информацию</string>
+    <string name="delete_playlist_line">Удалить плейлист</string>
+    <string name="empty_playlist_line">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="delete_playlist_question">Хотите удалить плейлист?</string>
+    <string name="edit_playlist_line">Редактировать</string>
+    <string name="save_editing_playlist_line">Сохранить</string>
 </resources>

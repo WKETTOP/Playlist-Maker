@@ -23,20 +23,31 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mediaLibraryFragment_to_onePlaylistFragment"
+            app:destination="@id/onePlaylistFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument
+                android:name="playlistId"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.playlistmaker.search.ui.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_trackFragment"
             app:destination="@id/trackFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -61,13 +72,53 @@
 
         <argument
             android:name="track"
-            app:argType="com.example.playlistmaker.search.domain.model.Track"/>
+            app:argType="com.example.playlistmaker.search.domain.model.Track" />
         <action
             android:id="@+id/action_trackFragment_to_createPlaylistFragment"
             app:destination="@id/createPlaylistFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+    <fragment
+        android:id="@+id/onePlaylistFragment"
+        android:name="com.example.playlistmaker.library.ui.OnePlaylistFragment"
+        android:label="fragment_one_playlist"
+        tools:layout="@layout/fragment_one_playlist">
+        <action
+            android:id="@+id/action_onePlaylistFragment_to_trackFragment"
+            app:destination="@id/trackFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+        <argument
+            android:name="playlistId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_onePlaylistFragment_to_mediaLibraryFragment"
+            app:destination="@id/mediaLibraryFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_onePlaylistFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.library.ui.PlaylistsFragment"
+        android:label="fragment_playlists"
+        tools:layout="@layout/fragment_playlists" />
+    <fragment
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.example.playlistmaker.library.ui.EditPlaylistFragment"
+        android:label="EditPlaylistFragment" />
 </navigation>

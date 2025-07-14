@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.playlistmaker.library.data.db.PlaylistEntity
 import com.example.playlistmaker.library.data.db.PlaylistTrackCrossRef
 import com.example.playlistmaker.library.data.db.PlaylistWithTracks
@@ -17,15 +18,29 @@ interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaylist(playlistEntity: PlaylistEntity)
 
+    @Update
+    suspend fun updatePlaylist(playlistEntity: PlaylistEntity)
+
     @Query("SELECT * FROM playlist_table ORDER BY createdAt DESC")
     fun getAllPlaylists(): Flow<List<PlaylistEntity>>
 
     @Transaction
-    @Query("SELECT * FROM playlist_table WHERE playlistId = :playlistId")
+    @Query("""
+        SELECT p.*, pt.trackId
+        FROM playlist_table p
+        LEFT JOIN playlist_tracks pt ON p.playlistId = pt.trackId
+        WHERE p.playlistId = :playlistId
+        ORDER BY pt.addedAt DESC
+    """)
     suspend fun getPlaylistWithTracks(playlistId: Int): PlaylistWithTracks?
 
     @Transaction
-    @Query("SELECT * FROM playlist_table ORDER BY createdAt DESC")
+    @Query("""
+        SELECT p.*, pt.trackId
+        FROM playlist_table p
+        LEFT JOIN playlist_tracks pt ON p.playlistId = pt.playlistId
+        ORDER BY p.createdAt DESC, pt.addedAt DESC
+    """)
     fun getAllPlaylistWithTracks(): Flow<List<PlaylistWithTracks>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -39,6 +54,9 @@ interface PlaylistDao {
 
     @Query("SELECT COUNT(*) FROM playlist_tracks WHERE playlistId = :playlistId")
     suspend fun getTrackCount(playlistId: Int): Int
+
+    @Query("SELECT trackId FROM playlist_tracks WHERE playlistId = :playlistId ORDER BY addedAt DESC")
+    suspend fun getTrackIdsFromPlaylist(playlistId: Int): List<String>
 
     @Delete
     suspend fun deletePlaylist(playlist: PlaylistEntity)

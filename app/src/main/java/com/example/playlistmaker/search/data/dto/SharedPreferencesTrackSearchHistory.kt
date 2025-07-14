@@ -1,6 +1,7 @@
 package com.example.playlistmaker.search.data.dto
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.example.playlistmaker.library.data.AppDatabase
 import com.example.playlistmaker.search.domain.TrackSearchHistory
 import com.example.playlistmaker.search.domain.model.Track
@@ -22,7 +23,7 @@ class SharedPreferencesTrackSearchHistory(
         val type = object : TypeToken<List<Track>>() {}.type
         val tracks: List<Track> = Gson().fromJson(json, type) ?: emptyList()
 
-        val tracksIdInFavorite = appDatabase.trackDao().getTracksId().toSet()
+        val tracksIdInFavorite = appDatabase.favoriteTrackDao().getTracksId().toSet()
 
         return tracks.map { track ->
             track.copy(isFavorite = track.trackId in tracksIdInFavorite)
@@ -45,14 +46,14 @@ class SharedPreferencesTrackSearchHistory(
 
     private fun saveTrackSearchHistory(trackHistory: List<Track>, prefs: SharedPreferences) {
         val json = Gson().toJson(trackHistory)
-        prefs.edit()
-            .putString(HISTORY_KEY, json)
-            .apply()
+        prefs.edit {
+            putString(HISTORY_KEY, json)
+        }
     }
 
     override fun clearTrackSearchHistory() {
-        prefs.edit()
-            .remove(HISTORY_KEY)
-            .apply()
+        prefs.edit {
+            remove(HISTORY_KEY)
+        }
     }
 }

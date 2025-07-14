@@ -40,9 +40,12 @@ class FavoriteTracksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        trackAdapter = TrackAdapter { track ->
-            navigateToTrackPlayer(track)
-        }
+        trackAdapter = TrackAdapter(
+            onClick = { track ->
+                navigateToTrackPlayer(track)
+            },
+            onLongItemClick = { }
+        )
 
         binding.favoriteTracks.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)

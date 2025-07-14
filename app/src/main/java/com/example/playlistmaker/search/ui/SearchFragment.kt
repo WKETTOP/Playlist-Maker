@@ -49,7 +49,10 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        trackAdapter = TrackAdapter(viewModel::onTrackClicked)
+        trackAdapter = TrackAdapter(
+            onClick = viewModel::onTrackClicked,
+            onLongItemClick = { }
+        )
 
         binding.searchResult.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)

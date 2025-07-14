@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private var _screenState = MutableStateFlow(CreatePlaylistViewState())
+    protected var _screenState = MutableStateFlow(CreatePlaylistViewState())
     val screenState: StateFlow<CreatePlaylistViewState> = _screenState
 
     private var _playlistCreated = MutableStateFlow<String?>(null)
@@ -60,7 +60,7 @@ class CreatePlaylistViewModel(
         }
     }
 
-    fun hasUnsavedChanges(): Boolean {
+    open fun hasUnsavedChanges(): Boolean {
         val state = _screenState.value
         return state.playlistTitle.isNotBlank() || state.playlistDescription.isNotBlank() || state.coverImageUri != null
     }

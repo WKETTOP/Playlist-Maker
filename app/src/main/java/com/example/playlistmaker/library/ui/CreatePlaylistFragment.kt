@@ -23,12 +23,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
     private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+    protected val binding get() = _binding!!
 
-    private val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected open val viewModel: CreatePlaylistViewModel by viewModel<CreatePlaylistViewModel>()
 
     private var titleTextWatcher: TextWatcher? = null
     private var descriptionTextWatcher: TextWatcher? = null
@@ -106,9 +106,6 @@ class CreatePlaylistFragment : Fragment() {
                 count: Int
             ) {
                 viewModel.updatePlaylistDescription(s?.toString().orEmpty())
-                if (!binding.newPlaylistDescriptionInput.hasFocus()) {
-                    binding.newPlaylistDescriptionInput.isEnabled = !s.isNullOrEmpty()
-                }
                 binding.newPlaylistDescriptionLabel.isVisible = !s.isNullOrEmpty()
             }
 
@@ -174,7 +171,7 @@ class CreatePlaylistFragment : Fragment() {
         _binding = null
     }
 
-    private fun handleBackPressed() {
+    protected open fun handleBackPressed() {
         if (viewModel.hasUnsavedChanges()) {
             showExitConfirmationDialog()
         } else {

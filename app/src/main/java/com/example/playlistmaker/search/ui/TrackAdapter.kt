@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.search.domain.model.Track
 
-class TrackAdapter(private val onClick: (Track) -> Unit) : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(
+    private val onClick: (Track) -> Unit,
+    private val onLongItemClick: (Track) -> Unit
+) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private val tracks = mutableListOf<Track>()
 
@@ -35,7 +38,13 @@ class TrackAdapter(private val onClick: (Track) -> Unit) : RecyclerView.Adapter<
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position], onClick)
+        val track = tracks[position]
+        holder.bind(track, onClick)
+        holder.itemView.setOnClickListener { onClick(track) }
+        holder.itemView.setOnLongClickListener {
+            onLongItemClick(track)
+            true
+        }
     }
 
     override fun getItemCount(): Int {

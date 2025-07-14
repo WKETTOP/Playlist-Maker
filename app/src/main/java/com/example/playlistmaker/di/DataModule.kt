@@ -52,7 +52,11 @@ val dataModule = module {
     }
 
     single {
-        get<AppDatabase>().trackDao()
+        get<AppDatabase>().playlistTrackDao()
+    }
+
+    single {
+        get<AppDatabase>().favoriteTrackDao()
     }
 
     single {

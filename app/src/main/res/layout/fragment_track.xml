@@ -336,12 +336,19 @@
         app:behavior_peekHeight="360dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
+        <View
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/padding_8"
+            android:background="@color/grey_light" />
+
         <TextView
             android:id="@+id/add_to_playlist_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/padding_42"
+            android:layout_marginTop="@dimen/padding_30"
             android:text="@string/add_to_playlist_line"
             android:textSize="19sp"
             android:textColor="@color/black_night"

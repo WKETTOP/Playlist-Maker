@@ -28,4 +28,6 @@ interface PlaylistRepository {
     suspend fun updatePlaylist(playlist: Playlist)
 
     suspend fun savePlaylistCover(uri: Uri): String?
+
+    suspend fun getPlaylistCoverUri(coverImagePath: String?): Uri?
 }

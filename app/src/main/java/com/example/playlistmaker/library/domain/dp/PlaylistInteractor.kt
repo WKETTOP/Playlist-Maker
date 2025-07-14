@@ -22,4 +22,8 @@ interface PlaylistInteractor {
     suspend fun updatePlaylist(playlist: Playlist)
 
     suspend fun savePlaylistCover(uri: Uri): String?
+
+    suspend fun getPlaylistWithTracks(playlistId: Int): Playlist?
+
+    suspend fun getPlaylistCoverUri(coverImagePath: String?): Uri?
 }

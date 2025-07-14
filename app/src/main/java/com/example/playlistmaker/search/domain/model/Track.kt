@@ -9,6 +9,7 @@ data class Track(
     val trackName: String,
     val artistName: String,
     val formattedTrackTime: String,
+    val trackTimeMillis: Long,
     val artworkUrl100: String,
     val collectionName: String,
     val formattedReleaseDate: String,

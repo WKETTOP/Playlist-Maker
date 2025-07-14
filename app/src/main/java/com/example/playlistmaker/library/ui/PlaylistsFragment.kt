@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -40,7 +41,11 @@ class PlaylistsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         playlistAdapter = PlaylistAdapter { playlist ->
-
+            val bundle = bundleOf("playlistId" to playlist.playlistId)
+            findNavController().navigate(
+                R.id.action_mediaLibraryFragment_to_onePlaylistFragment,
+                bundle
+            )
         }
 
         binding.playlistRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)

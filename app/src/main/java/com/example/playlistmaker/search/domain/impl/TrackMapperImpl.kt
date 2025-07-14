@@ -13,6 +13,7 @@ class TrackMapperImpl : TrackMapper {
             trackName = trackDto.trackName,
             artistName = trackDto.artistName,
             formattedTrackTime = Transform.millisToMin(trackDto.trackTimeMillis),
+            trackTimeMillis = trackDto.trackTimeMillis.toLong(),
             artworkUrl100 = trackDto.artworkUrl100,
             collectionName = trackDto.collectionName,
             formattedReleaseDate = Transform.dateToYear(trackDto.releaseDate),

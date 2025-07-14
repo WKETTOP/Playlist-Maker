@@ -37,7 +37,7 @@
     <string name="finish_creating_playlist_title_line">Complete playlist creation?</string>
     <string name="unsaved_data_line">All unsaved data will be lost</string>
     <string name="finish_line">Complete</string>
-    <string name="cancel_line"> Cancel</string>
+    <string name="cancel_line">Cancel</string>
     <plurals name="track_count">
         <item quantity="one">%d track</item>
         <item quantity="few">%d tracks</item>
@@ -47,4 +47,21 @@
     <string name="add_to_playlist_line">Add to playlist</string>
     <string name="added_to_playlist_line">Added to playlist %s</string>
     <string name="already_in_playlist_line">Track already in playlist %s</string>
+    <plurals name="duration_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="few">%d minutes</item>
+        <item quantity="many">%d minutes</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="less_minute">less than a minute</string>
+    <string name="delete_track_line">Do you want to delete a track?</string>
+    <string name="yes_line">Yes</string>
+    <string name="no_line">No</string>
+    <string name="share_line">Share</string>
+    <string name="edit_information_line">Edit Information</string>
+    <string name="delete_playlist_line">Delete playlist</string>
+    <string name="empty_playlist_line">There is no track list to share in this playlist</string>
+    <string name="delete_playlist_question">Do you want to delete a playlist?</string>
+    <string name="edit_playlist_line">Edit</string>
+    <string name="save_editing_playlist_line">Save</string>
 </resources>

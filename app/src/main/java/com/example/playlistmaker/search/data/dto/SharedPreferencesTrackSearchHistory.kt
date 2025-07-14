@@ -22,7 +22,7 @@ class SharedPreferencesTrackSearchHistory(
         val type = object : TypeToken<List<Track>>() {}.type
         val tracks: List<Track> = Gson().fromJson(json, type) ?: emptyList()
 
-        val tracksIdInFavorite = appDatabase.trackDao().getTracksId().toSet()
+        val tracksIdInFavorite = appDatabase.favoriteTrackDao().getTracksId().toSet()
 
         return tracks.map { track ->
             track.copy(isFavorite = track.trackId in tracksIdInFavorite)

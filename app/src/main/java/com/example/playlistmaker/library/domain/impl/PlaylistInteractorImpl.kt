@@ -48,4 +48,12 @@ class PlaylistInteractorImpl(
     override suspend fun savePlaylistCover(uri: Uri): String? {
          return playlistRepository.savePlaylistCover(uri)
     }
+
+    override suspend fun getPlaylistWithTracks(playlistId: Int): Playlist? {
+        return playlistRepository.getPlaylistWithTracks(playlistId)
+    }
+
+    override suspend fun getPlaylistCoverUri(coverImagePath: String?): Uri? {
+        return playlistRepository.getPlaylistCoverUri(coverImagePath)
+    }
 }

@@ -24,7 +24,7 @@ class TracksRepositoryImpl(
                 emit(Resource.Error("Check your internet connection"))
             }
             200 -> {
-                val tracksIdInFavorite = database.trackDao().getTracksId()
+                val tracksIdInFavorite = database.favoriteTrackDao().getTracksId()
                 emit(Resource.Success((response as TracksSearchResponse).results.map { trackDto ->
                     trackMapper.map(trackDto).apply {
                         isFavorite = trackId in tracksIdInFavorite

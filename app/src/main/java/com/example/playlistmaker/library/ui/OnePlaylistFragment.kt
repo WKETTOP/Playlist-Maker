@@ -49,7 +49,7 @@ class OnePlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         playlistId = arguments?.getInt("playlistId") ?: run {
-            findNavController().navigateUp()
+            navigateBack()
             return
         }
 
@@ -75,7 +75,7 @@ class OnePlaylistFragment : Fragment() {
         )
 
         binding.backButton.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateBack()
         }
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.onePlaylistBottomSheet).apply {
@@ -323,6 +323,10 @@ class OnePlaylistFragment : Fragment() {
                 findNavController().navigate(R.id.action_onePlaylistFragment_to_mediaLibraryFragment)
             }
             .show()
+    }
+
+    private fun navigateBack() {
+        findNavController().navigateUp()
     }
 
     override fun onDestroyView() {

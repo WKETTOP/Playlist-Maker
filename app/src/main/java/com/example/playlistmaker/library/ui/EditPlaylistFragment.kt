@@ -20,10 +20,10 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val playlistData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable("playlistData", OnePlaylistUiModel::class.java)
+            arguments?.getParcelable(ARG_PLAYLIST_DATA, OnePlaylistUiModel::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getParcelable("playlistData")
+            arguments?.getParcelable(ARG_PLAYLIST_DATA)
         }
 
         if (playlistData == null) {
@@ -72,5 +72,9 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
 
     override fun handleBackPressed() {
         findNavController().navigateUp()
+    }
+
+    companion object {
+        const val ARG_PLAYLIST_DATA = "playlistData"
     }
 }

@@ -48,7 +48,7 @@ class OnePlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistId = arguments?.getInt("playlistId") ?: run {
+        playlistId = arguments?.getInt(ARGS_PLAYLIST_ID) ?: run {
             navigateBack()
             return
         }
@@ -199,7 +199,7 @@ class OnePlaylistFragment : Fragment() {
         binding.editButton.setOnClickListener {
             val currentPlaylist = viewModel.playlistState.value
             if (currentPlaylist != null) {
-                val bundle = bundleOf("playlistData" to currentPlaylist)
+                val bundle = bundleOf(ARG_PLAYLIST_DATA to currentPlaylist)
                 findNavController().navigate(
                     R.id.action_onePlaylistFragment_to_editPlaylistFragment,
                     bundle
@@ -332,5 +332,10 @@ class OnePlaylistFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val ARGS_PLAYLIST_ID = "playlistId"
+        const val ARG_PLAYLIST_DATA = "playlistData"
     }
 }

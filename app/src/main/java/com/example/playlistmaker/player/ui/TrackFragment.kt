@@ -21,6 +21,8 @@ import com.example.playlistmaker.player.ui.model.AddTrackResult
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Transform
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -45,6 +47,8 @@ class TrackFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val firebase = FirebaseAnalytics.getInstance(requireContext())
 
         binding.backButton.setNavigationOnClickListener {
             findNavController().navigateUp()
@@ -95,6 +99,9 @@ class TrackFragment : Fragment() {
 
         binding.favoriteButton.setOnClickListener {
             viewModel.onFavoriteClick()
+            firebase.logEvent(FirebaseAnalytics.Event.ADD_TO_WISHLIST) {
+                param(FirebaseAnalytics.Param.ITEM_NAME, viewModel.track.trackName)
+            }
         }
 
         binding.addButton.setOnClickListener {
@@ -120,17 +127,7 @@ class TrackFragment : Fragment() {
         binding.yearValue.text = viewModel.track.formattedReleaseDate
         binding.genreValue.text = viewModel.track.primaryGenreName
         binding.countryValue.text = viewModel.track.country
-
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("playlist_created")
-            ?.observe(viewLifecycleOwner) { created ->
-                if (created == true) {
-                    viewModel.loadPlaylists()
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-                    findNavController().currentBackStackEntry?.savedStateHandle?.set("playlist_created", false)
-                }
-            }
-
+        
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -169,6 +166,18 @@ class TrackFragment : Fragment() {
                             viewModel.clearAddTrackResult()
                         }
                     }
+                }
+                launch {
+                    findNavController().currentBackStackEntry?.savedStateHandle
+                        ?.getStateFlow("playlist_created", false)
+                        ?.collect { created ->
+                            if (created) {
+                                viewModel.loadPlaylists()
+                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+                                findNavController().currentBackStackEntry?.savedStateHandle?.set("playlist_created", false)
+                            }
+                        }
                 }
             }
         }

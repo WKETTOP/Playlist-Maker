@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.library.domain.model.Playlist
 
-class BottomSheetPlaylistAdapter(private val onPlaylistClick: (Playlist) -> Unit) : RecyclerView.Adapter<BottomSheetPlaylistViewHolder>() {
+class BottomSheetPlaylistAdapter(
+    private val onPlaylistClick: (Playlist) -> Unit
+) : RecyclerView.Adapter<BottomSheetPlaylistViewHolder>() {
 
     private var playlists = mutableListOf<Playlist>()
 

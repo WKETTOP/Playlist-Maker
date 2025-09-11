@@ -18,15 +18,17 @@
 
 ## 🛠️ Технологии
 
-- Kotlin
-- ITunes API для поиска музыки
-- Retrofit2 для сетевых запросов
-- Single Activity подход
-- Архитектура MVVM
-- Jetpack Navigation Component для навигации
-- Koin для зависимостей
-- Flow и Coroutines для многопточности
-- Room для локального хранилища
+- **Kotlin** - основной язык разработки
+- **ITunes API** для поиска музыки
+- **Retrofit2** для сетевых запросов
+- **Single Activity** подход
+- **Android Jetpack Components**:
+  - ViewModel - для управления UI-данными
+  - StateFlow - для наблюдения за изменениями данных
+  - Room - для локального хранилища данных
+  - Navigation Component - для навигации между экранами
+- **Koin** для зависимостей
+- **Flow и Coroutines** для многопточности
 
 ## 📦 Установка
 
